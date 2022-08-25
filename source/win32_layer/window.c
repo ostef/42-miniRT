@@ -23,14 +23,6 @@ static LRESULT	wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		return (DefWindowProcA (hwnd, msg, wparam, lparam));
 	if (msg == WM_SIZE)
 		resize_framebuffer (win);
-/*
-	else if (msg == WM_PAINT)
-	{
-		hdc = BeginPaint (win->hwnd, &paint);
-		BitBlt (hdc, 0, 0, win->frame_width, win->frame_height, win->hbmpdc, 0, 0, SRCCOPY);
-		EndPaint (win->hwnd, &paint);
-	}
-*/
 	else if (msg == WM_CLOSE)
 		win->opened = FALSE;
 	return (DefWindowProcA (hwnd, msg, wparam, lparam));
@@ -48,6 +40,7 @@ static t_bool	register_wndclass(void)
 	wndclass.lpfnWndProc = wndproc;
 	wndclass.hInstance = GetModuleHandleA (NULL);
 	wndclass.lpszClassName = "WindowClass";
+	wndclass.hCursor = LoadCursorA (NULL, IDC_ARROW);
 	return (RegisterClassA (&wndclass) != 0);
 }
 
@@ -78,11 +71,19 @@ void	destroy_window(t_window *win)
 void	poll_window_events(t_window *win)
 {
 	MSG	msg;
+	int	key;
 
 	while (PeekMessageA (&msg, win->hwnd, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage (&msg);
 		DispatchMessageA (&msg);
+	}
+	ft_memcpy (g_keys.prev, g_keys.curr, sizeof (g_keys.prev));
+	key = 0;
+	while (key < 256)
+	{
+		g_keys.curr[key] = is_key_down (key);
+		key += 1;
 	}
 }
 
