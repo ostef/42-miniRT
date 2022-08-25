@@ -1,0 +1,6 @@
+[submodule "libft"]
+	path = libft
+	url = https://github.com/ostef/libft
+[submodule "ft_math"]
+	path = ft_math
+	url = https://github.com/ostef/ft_math
