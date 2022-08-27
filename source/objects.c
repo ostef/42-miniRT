@@ -24,7 +24,7 @@ t_object	*add_object(t_rt *rt)
 	return (&rt->objs[rt->obj_count - 1]);
 }
 
-void	add_sphere(t_rt *rt, t_vec3f center, t_f32 radius)
+t_object	*add_sphere(t_rt *rt, t_vec3f center, t_f32 radius)
 {
 	t_object	*obj;
 
@@ -32,9 +32,10 @@ void	add_sphere(t_rt *rt, t_vec3f center, t_f32 radius)
 	obj->shape = SPHERE;
 	obj->sphere.center = center;
 	obj->sphere.radius = radius;
+	return (obj);
 }
 
-void	add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius)
+t_object	*add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius)
 {
 	t_object	*obj;
 
@@ -43,9 +44,10 @@ void	add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius)
 	obj->cylinder.bottom = bottom;
 	obj->cylinder.top = top;
 	obj->cylinder.radius = radius;
+	return (obj);
 }
 
-void	add_plane(t_rt *rt, t_vec3f point, t_vec3f normal)
+t_object	*add_plane(t_rt *rt, t_vec3f point, t_vec3f normal)
 {
 	t_object	*obj;
 
@@ -53,6 +55,7 @@ void	add_plane(t_rt *rt, t_vec3f point, t_vec3f normal)
 	obj->shape = PLANE;
 	obj->plane.point = point;
 	obj->plane.normal = ft_vec3f_normalized(normal);
+	return (obj);
 }
 
 void	remove_object(t_rt *rt, t_s64 index)
