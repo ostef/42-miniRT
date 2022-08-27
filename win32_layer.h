@@ -20,10 +20,9 @@
 typedef struct s_window
 {
 	HWND		hwnd;
-	BITMAPINFO	bmp_info;
-	void		*pixels;
 	t_s64		frame_width;
 	t_s64		frame_height;
+	void		*pixels;
 	t_bool		opened;
 }	t_window;
 
@@ -34,8 +33,8 @@ typedef struct s_keyboard_state
 }	t_keyboard_state;
 
 t_bool	create_window(t_window *win, t_cstr title, int width, int height);
-t_bool	create_framebuffer(t_window *win, t_int width, t_int height);
 void	destroy_window(t_window *win);
+t_bool	allocate_framebuffer(t_window *win, t_int width, t_int height);
 void	poll_window_events(t_window *win);
 void	update_window(t_window *win);
 
