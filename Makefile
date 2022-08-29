@@ -20,7 +20,7 @@ ifdef OS	# This environment variable is only defined on Windows
 LIB_FILES = libft/libft.lib ft_math/libft_math.lib User32.lib Gdi32.lib
 OBJ_FILES = $(SRC_FILES:.c=.obj)
 CC = cl
-C_FLAGS = $(addprefix -I,$(INCLUDE_DIRS)) -TC -nologo
+C_FLAGS = $(addprefix -I,$(INCLUDE_DIRS)) -TC -nologo #-O2
 DEPENDENCIES = miniRT.h libft/libft.lib ft_math/libft_math.lib Makefile
 
 else
