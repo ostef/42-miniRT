@@ -80,6 +80,14 @@ t_object	*add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius);
 t_object	*add_plane(t_rt *rt, t_vec3f point, t_vec3f normal);
 void		remove_object(t_rt *rt, t_s64 index);
 
-t_bool		ray_sphere_intersection(t_ray ray, t_sphere sph, t_f32 *out_dist);
+typedef struct s_hit_result
+{
+	t_vec3f	normal;
+	t_vec3f	point;
+	t_f32	dist;
+	t_bool	hit;
+}	t_hit_result;
+
+t_bool		ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_result *res);
 
 #endif

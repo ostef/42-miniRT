@@ -30,17 +30,18 @@ int	main(void)
 	t_rt	rt;
 
 	ft_memset (&rt, 0, sizeof (rt));
-	rt.camera_direction = ft_vec3f(0, 0, 1);
 	if (!create_window (&rt.win, "miniRT", 640, 480))
 	{
 		ft_fprintln (STDERR, "Could not create window.");
 		return (1);
 	}
 
+	rt.camera_direction = ft_vec3f(0, 0, 1);
 	add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = rgb(255, 0, 0);
 	add_sphere (&rt, ft_vec3f (1, -6, 15), 9.0)->color = rgb (0, 255, 0);
 	add_sphere (&rt, ft_vec3f (-3.5, -1.4, 40), 20.0)->color = rgb (0, 0, 255);
-	
+
+	t_vec3f	light_dir = ft_vec3f_normalized (ft_vec3f (-1, -1, -1));
 	float scale = tanf (60.0f * 0.5f * PI / 180.0f);
 	while (rt.win.opened)
 	{
@@ -68,24 +69,30 @@ int	main(void)
 				float xx = (2 * (x + 0.5) * inv_width - 1) * image_aspect_ratio * scale;
 
 				ray.dir = ft_mat4f_transform_vector (view_matrix, ft_vec3f_normalized (ft_vec3f (xx, yy, 1)));
-				t_f32	closest_distance = ft_inf32 ();
+				t_hit_result	hit = {0};
+				t_hit_result	closest_hit = {0};
+				closest_hit.dist = ft_inf32 ();
 				t_s64	closest_object = -1;
 				for (int i = 0; i < rt.obj_count; i += 1)
 				{
 					if (rt.objs[i].shape != SPHERE)
 						continue ;
-					t_f32	distance;
-					if (ray_sphere_intersection (ray, rt.objs[i].sphere, &distance))
+					if (ray_sphere_intersection (ray, rt.objs[i].sphere, &hit))
 					{
-						if (distance < closest_distance)
+						if (hit.dist < closest_hit.dist)
 						{
-							closest_distance = distance;
+							closest_hit = hit;
 							closest_object = i;
 						}
 					}
 				}
 				if (closest_object != -1)
-					set_pixel (&rt.win, x, y, rt.objs[closest_object].color);
+				{
+					float d = ft_vec3f_dot (closest_hit.normal, ft_vec3f_neg (light_dir));
+					if (d < 0)
+						d = 0;
+					set_pixel (&rt.win, x, y, rgb ((t_u8)(d * 255), 0, 0));
+				}
 			}
 		}
 		update_window (&rt.win);
