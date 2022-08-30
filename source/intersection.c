@@ -50,3 +50,15 @@ t_bool	ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_result *res)
 	}
 	return (dist >= 0);
 }
+
+t_bool	ray_object_intersection(t_ray ray, t_object *obj, t_hit_result *res)
+{
+	t_bool	hit;
+
+	hit = FALSE;
+	if (obj->shape == SPHERE)
+		hit = ray_sphere_intersection (ray, obj->sphere, res);
+	if (hit)
+		res->object = obj;
+	return (hit);
+}

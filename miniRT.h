@@ -55,7 +55,7 @@ typedef struct s_object
 		t_cylinder	cylinder;
 		t_plane		plane;
 	};
-	t_u32			color;
+	t_vec4f			color;
 }	t_object;
 
 typedef struct s_ray
@@ -64,14 +64,26 @@ typedef struct s_ray
 	t_vec3f	dir;
 }	t_ray;
 
+typedef struct s_camera
+{
+	t_vec3f	position;
+	t_vec3f	direction;
+	t_mat4f	transform;
+	t_f32	fov_in_degrees;
+	t_f32	scale;
+	t_f32	width;
+	t_f32	height;
+	t_f32	aspect_ratio;
+}	t_camera;
+
 typedef struct s_rt
 {
 	t_window	win;
+	t_camera	camera;
+	t_vec3f		light_position;
 	t_object	*objs;
 	t_s64		obj_count;
 	t_s64		obj_cap;
-	t_vec3f		camera_position;
-	t_vec3f		camera_direction;
 }	t_rt;
 
 t_object	*add_object(t_rt *rt);
@@ -82,12 +94,18 @@ void		remove_object(t_rt *rt, t_s64 index);
 
 typedef struct s_hit_result
 {
-	t_vec3f	normal;
-	t_vec3f	point;
-	t_f32	dist;
-	t_bool	hit;
+	t_vec3f		normal;
+	t_vec3f		point;
+	t_f32		dist;
+	t_object	*object;
+	t_bool		hit;
 }	t_hit_result;
 
 t_bool		ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_result *res);
+t_bool		ray_object_intersection(t_ray ray, t_object *obj, t_hit_result *res);
+
+t_hit_result	raycast_first(t_rt *rt, t_ray ray);
+t_hit_result	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore);
+t_hit_result	raycast_closest(t_rt *rt, t_ray ray);
 
 #endif
