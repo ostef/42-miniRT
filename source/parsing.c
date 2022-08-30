@@ -115,18 +115,16 @@ t_f32	parse_float(t_str line)
 	return (result);
 }
 
-t_u32	parse_color(t_str line) //TODO checker range [0, 255]
+t_vec4f	parse_color(t_str line) //TODO checker range [0, 255]
 {
 	t_str	color_str;
 	t_pcstr	*split;
-	t_u32	color;
-	t_uint	r;
+	t_vec4f	color;
 	t_str	r_str;
-	t_uint	g;
 	t_str	g_str;
-	t_uint	b;
 	t_str	b_str;
 
+	ft_memset(&color, 0, sizeof(t_vec4f));
 	color_str = get_next_element(line);
 	split = ft_split(color_str, ',', ft_heap());
 	r_str = ft_strndup(split[0].data, split[0].len, ft_heap());
@@ -134,13 +132,12 @@ t_u32	parse_color(t_str line) //TODO checker range [0, 255]
 	b_str = ft_strndup(split[2].data, split[2].len, ft_heap());
 	ft_free(split, ft_heap());
 	ft_free(color_str, ft_heap());
-	ft_str_to_int(r_str, &r);
-	ft_str_to_int(g_str, &g);
-	ft_str_to_int(b_str, &b);
+	color.x = ft_atof(r_str);
+	color.y = ft_atof(g_str);
+	color.z = ft_atof(b_str);
 	ft_free(r_str, ft_heap());
 	ft_free(g_str, ft_heap());
 	ft_free(b_str, ft_heap());
-	color = r * 256 * 256 + g + b;
 	return (color);
 }
 
@@ -194,6 +191,7 @@ void	parse_line(t_str line, t_rt *rt)
 	if (!id)
 		return ;
 	ft_fprintln (STDERR, "test2");
+	ft_fprintln (STDERR, "id: %s", id);
 	if ((ft_strcmp(id, "sp") == 0) || (ft_strcmp(id, "pl") == 0) || (ft_strcmp(id, "cy") == 0))
 	{
 		ft_fprintln (STDERR, "test3");
@@ -221,9 +219,9 @@ void	parse_line(t_str line, t_rt *rt)
 	}
 	else if (ft_strcmp(id, "C"))
 	{
-		rt->camera_position = parse_coordinate(line);
-		rt->camera_direction = parse_coordinate(line); // TODO check range [-1, 1]
-		rt->camera_fov = parse_float(line); // TODO check range [0, 180] // float ou int ?
+		rt->camera.position = parse_coordinate(line);
+		rt->camera.direction = parse_coordinate(line); // TODO check range [-1, 1]
+		rt->camera.fov_in_degrees = parse_float(line); // TODO check range [0, 180] // float ou int ?
 	}
 	ft_free(id, ft_heap());
 	ft_free(line, ft_heap());

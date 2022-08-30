@@ -8,7 +8,7 @@ NAME = $(UNIX_NAME)
 endif
 
 SRC_DIR = source
-SRC_FILES = main.c objects.c intersection.c parsing.c\
+SRC_FILES = main.c objects.c intersection.c parsing.c raycast.c\
 	win32_layer/window.c win32_layer/input.c
 OBJ_DIR = obj
 INCLUDE_DIRS = libft ft_math .
