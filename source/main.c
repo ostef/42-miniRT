@@ -25,21 +25,24 @@ static inline void	clear_frame(t_window *win, t_u32 color)
 
 #define	rgb(r, g, b) (((r) << 16) | ((g) << 8) | (b))
 
-int	main(void)
+int	main(int ac, char **av)
 {
 	t_rt	rt;
 
 	ft_memset (&rt, 0, sizeof (rt));
-	rt.camera_direction = ft_vec3f(0, 0, 1);
+	// rt.camera_direction = ft_vec3f(0, 0, 1);
+	rt = parsing(av[1]);
+	ft_fprintln (STDERR, "file: %s", av[1]);
+	return (1);
 	if (!create_window (&rt.win, "miniRT", 640, 480))
 	{
 		ft_fprintln (STDERR, "Could not create window.");
 		return (1);
 	}
 
-	add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = rgb(255, 0, 0);
-	add_sphere (&rt, ft_vec3f (1, -6, 15), 9.0)->color = rgb (0, 255, 0);
-	add_sphere (&rt, ft_vec3f (-3.5, -1.4, 40), 20.0)->color = rgb (0, 0, 255);
+	// add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = rgb(255, 0, 0);
+	// add_sphere (&rt, ft_vec3f (1, -6, 15), 9.0)->color = rgb (0, 255, 0);
+	// add_sphere (&rt, ft_vec3f (-3.5, -1.4, 40), 20.0)->color = rgb (0, 0, 255);
 	
 	float scale = tanf (60.0f * 0.5f * PI / 180.0f);
 	while (rt.win.opened)

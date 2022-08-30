@@ -8,7 +8,7 @@ NAME = $(UNIX_NAME)
 endif
 
 SRC_DIR = source
-SRC_FILES = main.c objects.c intersection.c\
+SRC_FILES = main.c objects.c intersection.c parsing.c\
 	win32_layer/window.c win32_layer/input.c
 OBJ_DIR = obj
 INCLUDE_DIRS = libft ft_math .
@@ -20,7 +20,7 @@ ifdef OS	# This environment variable is only defined on Windows
 LIB_FILES = libft/libft.lib ft_math/libft_math.lib User32.lib Gdi32.lib
 OBJ_FILES = $(SRC_FILES:.c=.obj)
 CC = cl
-C_FLAGS = $(addprefix -I,$(INCLUDE_DIRS)) -TC -nologo #-O2
+C_FLAGS = $(addprefix -I,$(INCLUDE_DIRS)) -TC -nologo -O2
 DEPENDENCIES = miniRT.h libft/libft.lib ft_math/libft_math.lib Makefile
 
 else
