@@ -37,13 +37,13 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	if (hit.object)
 	{
 		t_vec3f	point_to_light = ft_vec3f_normalized (ft_vec3f_sub (rt->light_position, hit.point));
-		diffuse_intensity = ft_vec3f_dot (hit.normal, point_to_light);
-		if (diffuse_intensity < 0)
-			diffuse_intensity = 0;
 		ray.origin = hit.point;
 		ray.dir = point_to_light;
 		if (raycast_first_except (rt, ray, hit.object).hit)
 			diffuse_intensity = 0;
+		else
+			diffuse_intensity = ft_maxf (ft_vec3f_dot (hit.normal, point_to_light), 0);
+
 		t_vec4f	diffuse = ft_vec4f_mulf (rt->light_color, rt->light_color.w * diffuse_intensity);
 		t_vec4f	ambient = ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w);
 		t_vec4f	light = ft_vec4f_add (diffuse, ambient);
@@ -67,8 +67,10 @@ int	main(void)
 	}
 
 	rt.light_position = ft_vec3f (10, 10, 10);
-	rt.light_color = ft_vec4f (1, 1, 1, 0.7f);
-	rt.ambient_light = ft_vec4f (0.7f, 0.4f, 0.3f, 0.2f);
+	rt.light_color.rgb = ft_vec3f (1, 1, 1);
+	rt.light_color.w = 0.7f;
+	rt.ambient_light.rgb = ft_vec3f (0.7, 0.6, 0.4);
+	rt.ambient_light.w = 0.2f;
 	rt.camera.fov_in_degrees = 60.0f;
 	rt.camera.transform = ft_mat4f_identity ();
 	add_sphere (&rt, ft_vec3f (0, 0, 0), 1.0)->color = ft_vec4f(1, 1, 1, 0);
