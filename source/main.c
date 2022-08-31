@@ -26,7 +26,7 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 {
 	t_ray			ray;
 	t_hit_result	hit;
-	t_f32			light_intensity;
+	t_f32			diffuse_intensity;
 
 	ray.origin = ft_mat4f_transform_point(rt->camera.transform, rt->camera.position);
 	ray.dir = ft_vec3f (
@@ -37,15 +37,22 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	if (hit.object)
 	{
 		t_vec3f	point_to_light = ft_vec3f_normalized (ft_vec3f_sub (rt->light_position, hit.point));
-		light_intensity = ft_vec3f_dot (hit.normal, point_to_light);
-		if (light_intensity < 0)
-			light_intensity = 0;
+		diffuse_intensity = ft_vec3f_dot (hit.normal, point_to_light);
+		if (diffuse_intensity < 0)
+			diffuse_intensity = 0;
+
 		ray.origin = hit.point;
 		ray.dir = point_to_light;
 		if (raycast_first_except (rt, ray, hit.object).hit)
-			set_pixel (rt, px_x, px_y, ft_vec4f (0, 0, 0, 0));
-		else
-			set_pixel (rt, px_x, px_y, ft_vec4f_mulf (hit.object->color, light_intensity));
+			diffuse_intensity = 0;
+		t_vec4f	diffuse = ft_vec4f_mulf (rt->light_color, rt->light_color.w * diffuse_intensity);
+		t_vec4f	ambient = ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w);
+		t_vec4f	light = ft_vec4f_add (diffuse, ambient);
+		t_vec4f	color = hit.object->color;
+		color.r *= light.r;
+		color.g *= light.g;
+		color.b *= light.b;
+		set_pixel (rt, px_x, px_y, color);
 	}
 }
 
@@ -61,19 +68,23 @@ int	main(void)
 	}
 
 	rt.light_position = ft_vec3f (10, 10, 10);
+	rt.light_color = ft_vec4f (0.7f, 0.4f, 0.3f, 0.7f);
+	rt.ambient_light = ft_vec4f (0.7f, 0.4f, 0.3f, 0.2f);
 	rt.camera.direction = ft_vec3f(0, 0, 1);
 	rt.camera.fov_in_degrees = 60.0f;
 	add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = ft_vec4f(1, 0, 0, 0);
 	add_sphere (&rt, ft_vec3f (1, -8, 15), 9.0)->color = ft_vec4f(0, 1, 0, 0);
 	add_sphere (&rt, ft_vec3f (-3.5, -1.4, 60), 20.0)->color = ft_vec4f(0, 0, 1, 0);
 
-	t_vec3f	light_dir = ft_vec3f_normalized (ft_vec3f (-2, -1, -2));
 	while (rt.win.opened)
 	{
 		t_u64	start = GetTickCount64 ();
 
 		poll_window_events (&rt.win);
-		ft_memset (rt.win.pixels, 0, rt.win.frame_width * rt.win.frame_height * 4);
+
+		for (int y = 0; y < rt.win.frame_height; y += 1)
+			for (int x = 0; x < rt.win.frame_width; x += 1)
+				set_pixel (&rt, x, y, ft_vec4f_mulf (rt.ambient_light, rt.ambient_light.w));
 
 		rt.camera.width = rt.win.frame_width;
 		rt.camera.height = rt.win.frame_height;
@@ -85,12 +96,9 @@ int	main(void)
 		rt.camera.transform = ft_mat4f_look_at(rt.camera.position, rt.camera.direction);
 
 		for (int y = 0; y < rt.win.frame_height; y += 1)
-		{
 			for (int x = 0; x < rt.win.frame_width; x += 1)
-			{
 				render_pixel (&rt, x, y);
-			}
-		}
+
 		update_window (&rt.win);
 
 		ft_println ("%u", GetTickCount64 () - start);

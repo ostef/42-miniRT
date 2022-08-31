@@ -81,6 +81,8 @@ typedef struct s_rt
 	t_window	win;
 	t_camera	camera;
 	t_vec3f		light_position;
+	t_vec4f		light_color;
+	t_vec4f		ambient_light;
 	t_object	*objs;
 	t_s64		obj_count;
 	t_s64		obj_cap;
