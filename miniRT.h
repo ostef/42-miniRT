@@ -67,7 +67,8 @@ typedef struct s_ray
 typedef struct s_camera
 {
 	t_vec3f	position;
-	t_vec3f	direction;
+	t_f32	yaw;
+	t_f32	pitch;
 	t_mat4f	transform;
 	t_f32	fov_in_degrees;
 	t_f32	scale;

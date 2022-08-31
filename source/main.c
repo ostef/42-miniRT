@@ -28,7 +28,7 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	t_hit_result	hit;
 	t_f32			diffuse_intensity;
 
-	ray.origin = ft_mat4f_transform_point(rt->camera.transform, rt->camera.position);
+	ray.origin = rt->camera.position;
 	ray.dir = ft_vec3f (
 		(2 * (px_x + 0.5f) / rt->camera.width - 1) * rt->camera.aspect_ratio * rt->camera.scale,
 		(1 - 2 * (px_y + 0.5f) / rt->camera.height) * rt->camera.scale, 1);
@@ -40,7 +40,6 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 		diffuse_intensity = ft_vec3f_dot (hit.normal, point_to_light);
 		if (diffuse_intensity < 0)
 			diffuse_intensity = 0;
-
 		ray.origin = hit.point;
 		ray.dir = point_to_light;
 		if (raycast_first_except (rt, ray, hit.object).hit)
@@ -68,17 +67,21 @@ int	main(void)
 	}
 
 	rt.light_position = ft_vec3f (10, 10, 10);
-	rt.light_color = ft_vec4f (0.7f, 0.4f, 0.3f, 0.7f);
+	rt.light_color = ft_vec4f (1, 1, 1, 0.7f);
 	rt.ambient_light = ft_vec4f (0.7f, 0.4f, 0.3f, 0.2f);
-	rt.camera.direction = ft_vec3f(0, 0, 1);
 	rt.camera.fov_in_degrees = 60.0f;
-	add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = ft_vec4f(1, 0, 0, 0);
-	add_sphere (&rt, ft_vec3f (1, -8, 15), 9.0)->color = ft_vec4f(0, 1, 0, 0);
-	add_sphere (&rt, ft_vec3f (-3.5, -1.4, 60), 20.0)->color = ft_vec4f(0, 0, 1, 0);
+	rt.camera.transform = ft_mat4f_identity ();
+	add_sphere (&rt, ft_vec3f (0, 0, 0), 1.0)->color = ft_vec4f(1, 1, 1, 0);
+	add_sphere (&rt, ft_vec3f (0, 1, 20), 5.0)->color = ft_vec4f(1, 0, 0, 0);
+	add_sphere (&rt, ft_vec3f (1, -8, 15), 2.0)->color = ft_vec4f(0, 1, 0, 0);
+	add_sphere (&rt, ft_vec3f (-10, 20, 0), 7.0)->color = ft_vec4f(0, 0, 1, 0);
+	t_object	*planet = add_sphere (&rt, ft_vec3f (0, 0, 100), 60.0);
+	planet->color = ft_vec4f(1, 0, 1, 0);
 
 	while (rt.win.opened)
 	{
 		t_u64	start = GetTickCount64 ();
+		t_f32	seconds = ((t_f32)start) / 1000.0f;
 
 		poll_window_events (&rt.win);
 
@@ -89,11 +92,30 @@ int	main(void)
 		rt.camera.width = rt.win.frame_width;
 		rt.camera.height = rt.win.frame_height;
 		rt.camera.scale = tanf (rt.camera.fov_in_degrees * 0.5f * PI / 180.0f);
-		rt.camera.position.x += is_key_down ('D') - is_key_down ('A');
-		rt.camera.position.y += is_key_down ('E') - is_key_down ('Q');
-		rt.camera.position.z += is_key_down ('W') - is_key_down ('S');
+		t_f32	speed = 1;
+		if (is_key_down (KEY_SHIFT))
+			speed = 10;
+
+		t_vec3f	right = ft_mat4f_right_vector (rt.camera.transform);
+		t_vec3f	up = ft_mat4f_up_vector (rt.camera.transform);
+		t_vec3f	forward = ft_mat4f_forward_vector (rt.camera.transform);
+
+		rt.camera.yaw += (is_key_down (KEY_RIGHT) - is_key_down (KEY_LEFT)) * 2;
+		rt.camera.pitch += (is_key_down (KEY_UP) - is_key_down (KEY_DOWN)) * 2;
+		rt.camera.pitch = ft_clampf (rt.camera.pitch, -80, 80);
+
+		rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (right, (is_key_down ('D') - is_key_down ('A')) * speed));
+		rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (up, (is_key_down ('E') - is_key_down ('Q')) * speed));
+		rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (forward, (is_key_down ('W') - is_key_down ('S')) * speed));
+
+		rt.camera.transform = ft_mat4f_rotate (ft_vec3f (1, 0, 0), rt.camera.pitch * PI / 180.0f);
+		rt.camera.transform = ft_mat4f_mul (ft_mat4f_rotate (ft_vec3f (0, 1, 0), rt.camera.yaw * PI / 180.0f), rt.camera.transform);
+		rt.camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt.camera.position), rt.camera.transform);
+
 		rt.camera.aspect_ratio = rt.camera.width / rt.camera.height;
-		rt.camera.transform = ft_mat4f_look_at(rt.camera.position, rt.camera.direction);
+
+		rt.light_position = ft_vec3f (cosf (seconds * 0.6) * 500, sinf (seconds * 0.5) * 500, cosf (seconds * 0.2) * 500);
+		planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 500);
 
 		for (int y = 0; y < rt.win.frame_height; y += 1)
 			for (int x = 0; x < rt.win.frame_width; x += 1)
