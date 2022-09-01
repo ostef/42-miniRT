@@ -73,12 +73,13 @@ int	main(void)
 	rt.ambient_light.w = 0.2f;
 	rt.camera.fov_in_degrees = 60.0f;
 	rt.camera.transform = ft_mat4f_identity ();
-	add_sphere (&rt, ft_vec3f (0, 0, 0), 1.0)->color = ft_vec4f(1, 1, 1, 0);
 	add_sphere (&rt, ft_vec3f (0, 1, 20), 5.0)->color = ft_vec4f(1, 0, 0, 0);
 	add_sphere (&rt, ft_vec3f (1, -8, 15), 2.0)->color = ft_vec4f(0, 1, 0, 0);
 	add_sphere (&rt, ft_vec3f (-10, 20, 0), 7.0)->color = ft_vec4f(0, 0, 1, 0);
 	t_object	*planet = add_sphere (&rt, ft_vec3f (0, 0, 100), 60.0);
 	planet->color = ft_vec4f(1, 0, 1, 0);
+
+	add_plane (&rt, ft_vec3f (0, 70, 0), ft_vec3f (0, 1, 0))->color = ft_vec4f(1, 0.2, 0.4, 0);
 
 	while (rt.win.opened)
 	{
@@ -116,8 +117,8 @@ int	main(void)
 
 		rt.camera.aspect_ratio = rt.camera.width / rt.camera.height;
 
-		rt.light_position = ft_vec3f (cosf (seconds * 0.6) * 500, sinf (seconds * 0.5) * 500, cosf (seconds * 0.2) * 500);
-		planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 500);
+		rt.light_position = ft_vec3f (cosf (seconds * 0.6) * 10, -100 + sinf (seconds * 0.5) * 10, cosf (seconds * 0.2) * 10);
+		planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 200);
 
 		for (int y = 0; y < rt.win.frame_height; y += 1)
 			for (int x = 0; x < rt.win.frame_width; x += 1)

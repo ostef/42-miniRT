@@ -61,7 +61,8 @@ t_hit_result	raycast_closest(t_rt *rt, t_ray ray)
 	i = 0;
 	while (i < rt->obj_count)
 	{
-		if (ray_object_intersection (ray, &rt->objs[i], &hit) && hit.dist < closest.dist)
+		if (ray_object_intersection (ray, &rt->objs[i], &hit)
+			&& hit.dist < closest.dist)
 			closest = hit;
 		i += 1;
 	}
