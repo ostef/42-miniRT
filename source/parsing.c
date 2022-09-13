@@ -174,11 +174,11 @@ t_cylinder	parse_cylinder(t_str line)
 	diameter = parse_float(line);
 	height = parse_float(line);
 	cylinder.radius = diameter / 2;
-	cylinder.center = coordinate;
-	cylinder.height = height;
-	cylinder.up = direction;
-	// cylinder.top = ft_vec3f_add(coordinate, ft_vec3f_mulf(direction, height / 2));
-	// cylinder.bottom = ft_vec3f_sub(coordinate, ft_vec3f_mulf(direction, height / 2));
+	// cylinder.center = coordinate;
+	// cylinder.height = height;
+	// cylinder.up = direction;
+	cylinder.top = ft_vec3f_add(coordinate, ft_vec3f_mulf(direction, height / 2));
+	cylinder.bottom = ft_vec3f_sub(coordinate, ft_vec3f_mulf(direction, height / 2));
 	return (cylinder);
 }
 
