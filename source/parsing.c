@@ -1,4 +1,5 @@
 #include "miniRT.h"
+#include <stdio.h>
 
 // t_vec3f	get_camera_position(t_cstr content)
 // {
@@ -55,15 +56,23 @@ t_f32	ft_atof(t_cstr str)
 	t_f32	result;
 	t_s64	integer;
 	t_uint	index_decimal;
+	t_uint	i;
 
 	index_decimal = 0;
-	while (str[index_decimal] && str[index_decimal] != '.')
+	i = ft_strlen(str) - 1;
+	while (str[i] && str[i] != '.' && i > 0)
+	{
 		index_decimal++;
+		i--;
+	}
+	if (i == 0)
+		index_decimal = 0;
 	str_int = ft_strdup(str, ft_heap());
-	ft_memmove(str_int + index_decimal, str_int + index_decimal + 1, ft_strlen(str_int) - index_decimal - 1);
+	if (index_decimal != 0)
+		ft_memmove(str_int + i, str_int + i + 1, ft_strlen(str_int) - i);
 	ft_str_to_s64(str_int, &integer);
 	ft_free(str_int, ft_heap());
-	result = integer / ft_pow(10, index_decimal);
+	result = (t_f32)integer / ft_pow(10, index_decimal);
 	return (result);
 }
 
@@ -77,12 +86,7 @@ t_vec3f	parse_coordinate(t_str line)
 	t_str	z;
 
 	coordinate = get_next_element(line);
-	ft_fprintln (STDERR, "element: %s", coordinate);
 	split = ft_split(coordinate, ',', ft_heap());
-	ft_fprintln (STDERR, "1: %s", split[0].data);
-	ft_fprintln (STDERR, "2: %s", split[1].data);
-	ft_fprintln (STDERR, "3: %s", split[2].data);
-	ft_fprintln (STDERR, "test11");
 	if (!split[0].data)
 		ft_fprintln (STDERR, "split 0");
 	if (!split[1].data)
@@ -93,11 +97,9 @@ t_vec3f	parse_coordinate(t_str line)
 	x = ft_strndup(split[0].data, split[0].len, ft_heap());
 	y = ft_strndup(split[1].data, split[1].len, ft_heap());
 	z = ft_strndup(split[2].data, split[2].len, ft_heap());
-	ft_fprintln (STDERR, "test12");
 	ft_free(split, ft_heap());
 	ft_free(coordinate, ft_heap());
 	result = ft_vec3f(ft_atof(x), ft_atof(y), ft_atof(z));
-	ft_fprintln (STDERR, "test13");
 	ft_free(x, ft_heap());
 	ft_free(y, ft_heap());
 	ft_free(z, ft_heap());
@@ -145,11 +147,10 @@ t_sphere	parse_sphere(t_str line)
 {
 	t_sphere	sphere;
 
-	ft_fprintln (STDERR, "test8");
 	sphere.center =	parse_coordinate(line);
-	ft_fprintln (STDERR, "test9");
+	printf ("center: x: %f, y: %f, z: %f\n", sphere.center.x, sphere.center.y, sphere.center.z);
 	sphere.radius = parse_float(line) / 2;
-	ft_fprintln (STDERR, "test10");
+	printf ("radius: %f\n", sphere.radius);
 	return (sphere);
 }
 
@@ -186,24 +187,17 @@ void	parse_line(t_str line, t_rt *rt)
 	t_object	*object;
 
 	ft_fprintln (STDERR, "line: %s", line);
-	ft_fprintln (STDERR, "test1");
 	id = get_next_element(line);
 	if (!id)
 		return ;
-	ft_fprintln (STDERR, "test2");
 	ft_fprintln (STDERR, "id: %s", id);
 	if ((ft_strcmp(id, "sp") == 0) || (ft_strcmp(id, "pl") == 0) || (ft_strcmp(id, "cy") == 0))
 	{
-		ft_fprintln (STDERR, "test3");
 		object = add_object(rt);
-		ft_fprintln (STDERR, "test4");
 		if (ft_strcmp(id, "sp") == 0)
 		{
-			ft_fprintln (STDERR, "test5");
 			object->shape = SPHERE;
-			ft_fprintln (STDERR, "test6");
 			object->sphere = parse_sphere(line);
-			ft_fprintln (STDERR, "test7");
 		}
 		else if (ft_strcmp(id, "pl") == 0)
 		{
@@ -213,7 +207,7 @@ void	parse_line(t_str line, t_rt *rt)
 		else if (ft_strcmp(id, "cy") == 0)
 		{
 			object->shape = CYLINDER;
-			object->cylinder	= parse_cylinder(line);
+			object->cylinder = parse_cylinder(line);
 		}
 		object->color = parse_color(line);
 	}
@@ -235,8 +229,11 @@ t_rt	parsing(t_str filename)
 	t_uint	i;
 
 	ft_memset(&output, 0, sizeof(t_rt));
+	ft_fprintln (STDERR, "test");
 	file_content = ft_read_entire_file(filename, ft_heap());
-	content_splited = ft_split(file_content, '\n', ft_heap());
+	ft_fprintln (STDERR, "test2");
+	content_splited = ft_split(file_content, '\n', ft_heap()); // segfault
+	ft_fprintln (STDERR, "test3");
 	i = 0;
 	while (content_splited[i].data)
 	{

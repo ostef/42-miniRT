@@ -54,27 +54,26 @@ int	main(int ac, char **av)
 	t_rt	rt;
 
 	ft_memset (&rt, 0, sizeof (rt));
-	// rt.camera_direction = ft_vec3f(0, 0, 1);
-	rt = parsing(av[1]);
+	// rt = parsing(av[1]);
 	ft_fprintln (STDERR, "file: %s", av[1]);
-	return (1);
+	// return (1);
 	if (!create_window (&rt.win, "miniRT", 640, 480))
 	{
 		ft_fprintln (STDERR, "Could not create window.");
 		return (1);
 	}
 
-	// add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = rgb(255, 0, 0);
-	// add_sphere (&rt, ft_vec3f (1, -6, 15), 9.0)->color = rgb (0, 255, 0);
-	// add_sphere (&rt, ft_vec3f (-3.5, -1.4, 40), 20.0)->color = rgb (0, 0, 255);
+	// add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = ft_vec4f(255, 0, 0, 0);
+	// add_sphere (&rt, ft_vec3f (1, -6, 15), 9.0)->color = ft_vec4f(255, 0, 0, 0);
+	// add_sphere (&rt, ft_vec3f (-3.5, -1.4, 40), 20.0)->color = ft_vec4f(255, 0, 0, 0);
 	
 	float scale = tanf (60.0f * 0.5f * PI / 180.0f);
-	// rt.light_position = ft_vec3f (10, 10, 10);
-	// rt.camera.direction = ft_vec3f(0, 0, 1);
-	// rt.camera.fov_in_degrees = 60.0f;
-	// add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = ft_vec4f(1, 0, 0, 0);
-	// add_sphere (&rt, ft_vec3f (1, -8, 15), 9.0)->color = ft_vec4f(0, 1, 0, 0);
-	// add_sphere (&rt, ft_vec3f (-3.5, -1.4, 60), 20.0)->color = ft_vec4f(0, 0, 1, 0);
+	rt.light_position = ft_vec3f (10, 10, 10);
+	rt.camera.direction = ft_vec3f(0, 0, 1);
+	rt.camera.fov_in_degrees = 60.0f;
+	add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = ft_vec4f(1, 0, 0, 0);
+	add_sphere (&rt, ft_vec3f (1, -8, 15), 9.0)->color = ft_vec4f(0, 1, 0, 0);
+	add_sphere (&rt, ft_vec3f (-3.5, -1.4, 60), 20.0)->color = ft_vec4f(0, 0, 1, 0);
 
 	t_vec3f	light_dir = ft_vec3f_normalized (ft_vec3f (-2, -1, -2));
 	while (rt.win.opened)
