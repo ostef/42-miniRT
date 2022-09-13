@@ -117,11 +117,11 @@ t_f32	parse_float(t_str line)
 	return (result);
 }
 
-t_vec4f	parse_color(t_str line) //TODO checker range [0, 255]
+t_vec3f	parse_color(t_str line) //TODO checker range [0, 255]
 {
 	t_str	color_str;
 	t_pcstr	*split;
-	t_vec4f	color;
+	t_vec3f	color;
 	t_str	r_str;
 	t_str	g_str;
 	t_str	b_str;
@@ -134,9 +134,9 @@ t_vec4f	parse_color(t_str line) //TODO checker range [0, 255]
 	b_str = ft_strndup(split[2].data, split[2].len, ft_heap());
 	ft_free(split, ft_heap());
 	ft_free(color_str, ft_heap());
-	color.x = ft_atof(r_str);
-	color.y = ft_atof(g_str);
-	color.z = ft_atof(b_str);
+	color.r = ft_atof(r_str);
+	color.g = ft_atof(g_str);
+	color.b = ft_atof(b_str);
 	ft_free(r_str, ft_heap());
 	ft_free(g_str, ft_heap());
 	ft_free(b_str, ft_heap());
@@ -148,9 +148,7 @@ t_sphere	parse_sphere(t_str line)
 	t_sphere	sphere;
 
 	sphere.center =	parse_coordinate(line);
-	printf ("center: x: %f, y: %f, z: %f\n", sphere.center.x, sphere.center.y, sphere.center.z);
 	sphere.radius = parse_float(line) / 2;
-	printf ("radius: %f\n", sphere.radius);
 	return (sphere);
 }
 
@@ -158,7 +156,7 @@ t_plane	parse_plane(t_str line)
 {
 	t_plane	plane;
 
-	plane.point = parse_coordinate(line);
+	plane.origin = parse_coordinate(line);
 	plane.normal = parse_coordinate(line); // TODO checker range [-1,1]
 	return (plane);
 }
@@ -176,8 +174,11 @@ t_cylinder	parse_cylinder(t_str line)
 	diameter = parse_float(line);
 	height = parse_float(line);
 	cylinder.radius = diameter / 2;
-	cylinder.top = ft_vec3f_add(coordinate, ft_vec3f_mulf(direction, height / 2));
-	cylinder.bottom = ft_vec3f_sub(coordinate, ft_vec3f_mulf(direction, height / 2));
+	cylinder.center = coordinate;
+	cylinder.height = height;
+	cylinder.up = direction;
+	// cylinder.top = ft_vec3f_add(coordinate, ft_vec3f_mulf(direction, height / 2));
+	// cylinder.bottom = ft_vec3f_sub(coordinate, ft_vec3f_mulf(direction, height / 2));
 	return (cylinder);
 }
 
@@ -209,13 +210,29 @@ void	parse_line(t_str line, t_rt *rt)
 			object->shape = CYLINDER;
 			object->cylinder = parse_cylinder(line);
 		}
-		object->color = parse_color(line);
+		object->color.rgb = parse_color(line);
 	}
-	else if (ft_strcmp(id, "C"))
+	else if (ft_strcmp(id, "C") == 0)
 	{
+		ft_fprintln (STDERR, "test");
 		rt->camera.position = parse_coordinate(line);
-		rt->camera.direction = parse_coordinate(line); // TODO check range [-1, 1]
+		t_vec3f direction = parse_coordinate(line); // TODO check range [-1, 1]
+		// rt->camera.yaw = atan2f(direction.y, direction.x); // TODO ft_atan2f
+		// t_f32 distance = sqrt(direction.z * direction.z + direction.x * direction.x); // TODO ft_sqrt
+		// rt->camera.pitch = asinf(direction.y / distance);  // TODO asinf
 		rt->camera.fov_in_degrees = parse_float(line); // TODO check range [0, 180] // float ou int ?
+		rt->camera.transform = ft_mat4f_identity ();
+	}
+	else if (ft_strcmp(id, "A") == 0)
+	{
+		rt->ambient_light.w = parse_float(line);
+		rt->ambient_light.rgb = parse_color(line);
+	}
+	else if (ft_strcmp(id, "L") == 0)
+	{
+		rt->light_position = parse_coordinate(line);
+		rt->light_color.w = parse_float(line);
+		rt->light_color.rgb = parse_color(line);
 	}
 	ft_free(id, ft_heap());
 	ft_free(line, ft_heap());
@@ -229,11 +246,8 @@ t_rt	parsing(t_str filename)
 	t_uint	i;
 
 	ft_memset(&output, 0, sizeof(t_rt));
-	ft_fprintln (STDERR, "test");
 	file_content = ft_read_entire_file(filename, ft_heap());
-	ft_fprintln (STDERR, "test2");
-	content_splited = ft_split(file_content, '\n', ft_heap()); // segfault
-	ft_fprintln (STDERR, "test3");
+	content_splited = ft_split(file_content, '\n', ft_heap()); // TODO proteger split quand str est nulle
 	i = 0;
 	while (content_splited[i].data)
 	{
