@@ -89,6 +89,13 @@ int	main(int ac, char **av)
 
 	// add_plane (&rt, ft_vec3f (0, 70, 0), ft_vec3f (0, 1, 0))->color = ft_vec4f(1, 0.2, 0.4, 0);
 
+	t_object	*obj = add_object (&rt);
+	obj->shape = CYLINDER;
+	obj->cylinder.bottom = ft_vec3f (0, 0, 0);
+	obj->cylinder.top = ft_vec3f (0, 5, 0);
+	obj->cylinder.radius = 3;
+	obj->color = ft_vec4f (1, 0, 0, 0);
+
 	while (rt.win.opened)
 	{
 		t_u64	start = GetTickCount64 ();
