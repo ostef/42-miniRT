@@ -17,6 +17,13 @@
 //TODO lumiere
 //TODO lumiere ambiante
 
+void	ft_error(t_cstr str)
+{
+	ft_fprintln (STDERR, "Error");
+	ft_fprintln (STDERR, "%s", str);
+	exit(EXIT_FAILURE);
+}
+
 t_str	get_next_element(t_str line)
 {
 	t_str	element;
@@ -31,7 +38,7 @@ t_str	get_next_element(t_str line)
 		len++;
 	element = ft_alloc(len + 1, ft_heap());
 	ft_strncpy(element, line + start, len);
-	ft_memmove(line, line + start + len + 1, ft_strlen(line) - start - len - 1);
+	ft_memmove(line, line + start + len + 1, ft_strlen(line) - start - len);
 	return (element);
 }
 
@@ -234,6 +241,8 @@ void	parse_line(t_str line, t_rt *rt)
 		rt->light_color.w = parse_float(line);
 		rt->light_color.rgb = parse_color(line);
 	}
+	else
+		ft_error("Unknown identifier in file");
 	ft_free(id, ft_heap());
 	ft_free(line, ft_heap());
 }
@@ -245,8 +254,12 @@ t_rt	parsing(t_str filename)
 	t_pcstr	*content_splited;
 	t_uint	i;
 
+	if (!filename)
+		ft_error("No file given in argument.");
 	ft_memset(&output, 0, sizeof(t_rt));
 	file_content = ft_read_entire_file(filename, ft_heap());
+	if (!file_content)
+		ft_error("Problem while readin file.");
 	content_splited = ft_split(file_content, '\n', ft_heap()); // TODO proteger split quand str est nulle
 	i = 0;
 	while (content_splited[i].data)

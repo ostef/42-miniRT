@@ -60,7 +60,6 @@ int	main(int ac, char **av)
 	t_rt	rt;
 
 	ft_memset (&rt, 0, sizeof (rt));
-	ft_fprintln (STDERR, "file: %s", av[1]);
 	rt = parsing(av[1]);
 	if (!create_window (&rt.win, "miniRT", 640, 480))
 	{
