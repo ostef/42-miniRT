@@ -60,19 +60,15 @@ int	main(int ac, char **av)
 	t_rt	rt;
 
 	ft_memset (&rt, 0, sizeof (rt));
-	rt = parsing(av[1]);
 	ft_fprintln (STDERR, "file: %s", av[1]);
-	// return (1);
+	rt = parsing(av[1]);
 	if (!create_window (&rt.win, "miniRT", 640, 480))
 	{
 		ft_fprintln (STDERR, "Could not create window.");
 		return (1);
 	}
+	 
 
-	// add_sphere (&rt, ft_vec3f (0, 1, 20), 10.0)->color = ft_vec4f(255, 0, 0, 0);
-	// add_sphere (&rt, ft_vec3f (1, -6, 15), 9.0)->color = ft_vec4f(255, 0, 0, 0);
-	// add_sphere (&rt, ft_vec3f (-3.5, -1.4, 40), 20.0)->color = ft_vec4f(255, 0, 0, 0);
-	
 	float scale = tanf (60.0f * 0.5f * PI / 180.0f);
 	// rt.light_position = ft_vec3f (10, 10, 10);
 	// rt.light_color.rgb = ft_vec3f (1, 1, 1);
@@ -81,13 +77,27 @@ int	main(int ac, char **av)
 	// rt.ambient_light.w = 0.2f;
 	// rt.camera.fov_in_degrees = 60.0f;
 	// rt.camera.transform = ft_mat4f_identity ();
+
 	// add_sphere (&rt, ft_vec3f (0, 1, 20), 5.0)->color = ft_vec4f(1, 0, 0, 0);
 	// add_sphere (&rt, ft_vec3f (1, -8, 15), 2.0)->color = ft_vec4f(0, 1, 0, 0);
 	// add_sphere (&rt, ft_vec3f (-10, 20, 0), 7.0)->color = ft_vec4f(0, 0, 1, 0);
+	// add_plane (&rt, ft_vec3f (0, 70, 0), ft_vec3f (0, 1, 0))->color = ft_vec4f(1, 0.2, 0.4, 0);
+
+	// C 0,0,0 0,0,0 60
+
+	// sp 0,1,20 5 255,0,0
+	// sp 1,-8,15 2 0,255,0
+	// sp -10,20,0 7 0,0,255
+
+	// A 0.2 179,153,102
+
+	// pl 0,70,0 0,1,0 255,51,102
+
+	// L 10,10,10 0.7 255,255,255
+
 	t_object	*planet = add_sphere (&rt, ft_vec3f (0, 0, 100), 60.0);
 	planet->color = ft_vec4f(1, 0, 1, 0);
 
-	// add_plane (&rt, ft_vec3f (0, 70, 0), ft_vec3f (0, 1, 0))->color = ft_vec4f(1, 0.2, 0.4, 0);
 
 	t_object	*obj = add_object (&rt);
 	obj->shape = CYLINDER;

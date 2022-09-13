@@ -134,9 +134,9 @@ t_vec3f	parse_color(t_str line) //TODO checker range [0, 255]
 	b_str = ft_strndup(split[2].data, split[2].len, ft_heap());
 	ft_free(split, ft_heap());
 	ft_free(color_str, ft_heap());
-	color.r = ft_atof(r_str);
-	color.g = ft_atof(g_str);
-	color.b = ft_atof(b_str);
+	color.r = ft_atof(r_str) / 255;
+	color.g = ft_atof(g_str) / 255;
+	color.b = ft_atof(b_str) / 255;
 	ft_free(r_str, ft_heap());
 	ft_free(g_str, ft_heap());
 	ft_free(b_str, ft_heap());
