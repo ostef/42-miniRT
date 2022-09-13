@@ -35,11 +35,8 @@ typedef struct s_sphere
 
 typedef struct s_cylinder
 {
-	t_vec3f	center;
-	t_vec3f	right;
-	t_vec3f	forward;
-	t_vec3f	up;
-	t_f32	height;
+	t_vec3f	top;
+	t_vec3f	bottom;
 	t_f32	radius;
 }	t_cylinder;
 
