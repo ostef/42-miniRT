@@ -53,8 +53,8 @@ t_bool	ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_result *res)
 
 t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_result *res)
 {
-	t_hit_result	tmp_hit;
-	t_plane			pla;
+	// t_hit_result	tmp_hit;
+	// t_plane			pla;
 
 	t_vec3f	pa;
 	t_vec3f	pb;

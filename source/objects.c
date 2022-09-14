@@ -41,9 +41,9 @@ t_object	*add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius)
 
 	obj = add_object(rt);
 	obj->shape = CYLINDER;
-	//obj->cylinder.bottom = bottom;
-	//obj->cylinder.top = top;
-	//obj->cylinder.radius = radius;
+	obj->cylinder.bottom = bottom;
+	obj->cylinder.top = top;
+	obj->cylinder.radius = radius;
 	return (obj);
 }
 

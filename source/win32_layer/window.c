@@ -12,6 +12,16 @@
 
 #include "win32_layer.h"
 
+void	set_pixel(t_rt *rt, int x, int y, t_vec4f color)
+{
+	color.x = ft_clampf (color.x, 0, 1);
+	color.y = ft_clampf (color.y, 0, 1);
+	color.z = ft_clampf (color.z, 0, 1);
+	((t_u32 *)rt->win.pixels)[y * rt->win.frame_width + x] =
+			(((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
+			| ((t_u8)(color.z * 255));
+}
+
 static LRESULT	wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	t_window	*win;

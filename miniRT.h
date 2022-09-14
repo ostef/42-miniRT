@@ -13,10 +13,14 @@
 #ifndef MINIRT_H
 # define MINIRT_H
 
+#include <stdio.h>
+# include <math.h>
 # include "libft.h"
 # include "ft_math.h"
 # ifdef FT_WIN32
 #  include "win32_layer.h"
+# else
+#  include "minilibx_layer.h"
 # endif
 
 typedef enum e_shape

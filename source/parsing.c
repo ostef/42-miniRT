@@ -224,6 +224,7 @@ void	parse_line(t_str line, t_rt *rt)
 		ft_fprintln (STDERR, "test");
 		rt->camera.position = parse_coordinate(line);
 		t_vec3f direction = parse_coordinate(line); // TODO check range [-1, 1]
+		(void)direction;
 		// rt->camera.yaw = atan2f(direction.y, direction.x); // TODO ft_atan2f
 		// t_f32 distance = sqrt(direction.z * direction.z + direction.x * direction.x); // TODO ft_sqrt
 		// rt->camera.pitch = asinf(direction.y / distance);  // TODO asinf

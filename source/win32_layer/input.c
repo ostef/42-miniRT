@@ -28,8 +28,9 @@ t_bool	was_key_down(t_key key)
 	return (g_keys.prev[key]);
 }
 
-t_bool	is_key_down(t_key key)
+t_bool	is_key_down(void *null, t_key key)
 {
+	(void)null;
 	return (GetAsyncKeyState (key) & 0x8000) != 0;
 }
 

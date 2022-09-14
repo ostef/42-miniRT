@@ -38,6 +38,8 @@ t_bool	allocate_framebuffer(t_window *win, t_int width, t_int height);
 void	poll_window_events(t_window *win);
 void	update_window(t_window *win);
 
+void	set_pixel(t_window *win, int x, int y, t_vec4f color);
+
 typedef enum e_key
 {
 	UNKNOWN = 0,
@@ -115,7 +117,7 @@ extern t_keyboard_state	g_keys;
 
 t_vec2f	get_mouse_pos(t_window *win);
 t_bool	was_key_down(t_key key);
-t_bool	is_key_down(t_key key);
+t_bool	is_key_down(void *null, t_key key);
 t_bool	is_key_pressed(t_key key);
 t_bool	is_key_released(t_key key);
 

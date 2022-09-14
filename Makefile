@@ -1,19 +1,23 @@
 WINDOWS_NAME = miniRT.exe
 UNIX_NAME = miniRT
 
-ifdef OS
-NAME = $(WINDOWS_NAME)
-else
-NAME = $(UNIX_NAME)
-endif
-
 SRC_DIR = source
-SRC_FILES = main.c objects.c intersection.c parsing.c raycast.c\
-	win32_layer/window.c win32_layer/input.c
+SRC_FILES = main.c objects.c intersection.c parsing.c raycast.c
 OBJ_DIR = obj
 INCLUDE_DIRS = libft ft_math .
 LIB_DIRS = libft ft_math
 LIBS = ft ft_math
+
+ifdef OS
+NAME = $(WINDOWS_NAME)
+SRC_FILES += win32_layer/window.c win32_layer/input.c
+else
+NAME = $(UNIX_NAME)
+SRC_FILES += mlx_layer/window.c mlx_layer/input.c
+INCLUDE_DIRS += mlx
+LIB_DIRS += mlx
+LIBS += mlx
+endif
 
 ifdef OS	# This environment variable is only defined on Windows
 
@@ -27,12 +31,19 @@ else
 
 OBJ_FILES = $(SRC_FILES:.c=.o)
 CC = gcc
-C_FLAGS = -Wall -Wextra -Werror $(addprefix -I,$(INCLUDE_DIRS))
-DEPENDENCIES = miniRT.h libft/libft.a ft_math/libft_math.a Makefile
+C_FLAGS = -Wall -Wextra -Werror $(addprefix -I, $(INCLUDE_DIRS))
+DEPENDENCIES = miniRT.h libft/libft.a ft_math/libft_math.a mlx/libmlx.a Makefile
 
 endif
 
+ifdef OS
 all: libft ft_math $(NAME)
+
+else
+
+all: libft ft_math mlx $(NAME)
+
+endif
 
 .PRECIOUS: $(OBJ_DIR)/%.o
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPENDENCIES)
@@ -46,7 +57,8 @@ $(OBJ_DIR)/%.obj: $(SRC_DIR)/%.c $(DEPENDENCIES)
 
 ifndef OS
 $(NAME): $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
-	$(CC) $(C_FLAGS) $(addprefix $(OBJ_DIR)/, $(OBJ_FILES)) $(addprefix -L, $(LIB_DIRS)) -o $(NAME)
+# $(CC) $(C_FLAGS) $(addprefix $(OBJ_DIR)/, $(OBJ_FILES)) $(addprefix -L, $(LIB_DIRS)) -o $(NAME)
+	$(CC) $(C_FLAGS) $(addprefix $(OBJ_DIR)/, $(OBJ_FILES)) libft/libft.a ft_math/libft_math.a -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 endif
 
 %.exe: $(addprefix $(OBJ_DIR)/,$(OBJ_FILES))
@@ -57,6 +69,9 @@ libft:
 
 ft_math:
 	@ $(MAKE) -C ft_math
+
+mlx:
+	@ $(MAKE) -C mlx
 
 clean:
 	rm -rf $(OBJ_DIR)
