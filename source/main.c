@@ -55,10 +55,67 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	}
 }
 
+int	tick(t_rt *rt)
+{
+	ft_fprintln (STDERR, "Tick");
+
+	// while (rt->win.opened)
+	// {
+		// t_u64	start = GetTickCount64 ();
+		// t_f32	seconds = ((t_f32)start) / 1000.0f;
+
+		// poll_window_events (&rt->win);
+
+		for (int y = 0; y < rt->win.frame_height; y += 1)
+			for (int x = 0; x < rt->win.frame_width; x += 1)
+				set_pixel (&rt->win, x, y, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
+
+		rt->camera.width = rt->win.frame_width;
+		rt->camera.height = rt->win.frame_height;
+		rt->camera.scale = tanf (rt->camera.fov_in_degrees * 0.5f * PI / 180.0f);
+		t_f32	speed = 1;
+		if (is_key_down (&rt->win, KEY_SHIFT))
+			speed = 10;
+
+		t_vec3f	right = ft_mat4f_right_vector (rt->camera.transform);
+		t_vec3f	up = ft_mat4f_up_vector (rt->camera.transform);
+		t_vec3f	forward = ft_mat4f_forward_vector (rt->camera.transform);
+
+		ft_fprintln (STDERR, "is_key_down key right: %d", rt->win.inputs[KEY_DOWN]);
+		rt->camera.yaw += (is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT)) * 2;
+		rt->camera.pitch += (is_key_down (&rt->win, KEY_UP) - is_key_down (&rt->win, KEY_DOWN)) * 2;
+		rt->camera.pitch = ft_clampf (rt->camera.pitch, -80, 80);
+
+		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (right, (is_key_down (&rt->win, 'D') - is_key_down (&rt->win, 'A')) * speed));
+		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (up, (is_key_down (&rt->win, 'E') - is_key_down (&rt->win, 'Q')) * speed));
+		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (forward, (is_key_down (&rt->win, 'W') - is_key_down (&rt->win, 'S')) * speed));
+
+		rt->camera.transform = ft_mat4f_rotate (ft_vec3f (1, 0, 0), rt->camera.pitch * PI / 180.0f);
+		rt->camera.transform = ft_mat4f_mul (ft_mat4f_rotate (ft_vec3f (0, 1, 0), rt->camera.yaw * PI / 180.0f), rt->camera.transform);
+		rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt->camera.position), rt->camera.transform);
+
+		rt->camera.aspect_ratio = rt->camera.width / rt->camera.height;
+
+		// rt->light_position = ft_vec3f (cosf (seconds * 0.6) * 10, -100 + sinf (seconds * 0.5) * 10, cosf (seconds * 0.2) * 10);
+		// planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 200);
+
+		for (int y = 0; y < rt->win.frame_height; y += 1)
+			for (int x = 0; x < rt->win.frame_width; x += 1)
+				render_pixel (rt, x, y);
+
+		update_window (&rt->win);
+
+		// ft_println ("%u", GetTickCount64 () - start);
+		// Sleep (10);
+	// }
+	return (0);
+}
+
 int	main(int ac, char **av)
 {
 	t_rt	rt;
 
+	(void)av;
 	if (ac < 2 || ac > 3)
 		return (1);
 	ft_memset (&rt, 0, sizeof (rt));
@@ -78,10 +135,10 @@ int	main(int ac, char **av)
 	// rt.camera.fov_in_degrees = 60.0f;
 	// rt.camera.transform = ft_mat4f_identity ();
 
-	// add_sphere (&rt, ft_vec3f (0, 1, 20), 5.0)->color = ft_vec4f(1, 0, 0, 0);
-	// add_sphere (&rt, ft_vec3f (1, -8, 15), 2.0)->color = ft_vec4f(0, 1, 0, 0);
-	// add_sphere (&rt, ft_vec3f (-10, 20, 0), 7.0)->color = ft_vec4f(0, 0, 1, 0);
-	// add_plane (&rt, ft_vec3f (0, 70, 0), ft_vec3f (0, 1, 0))->color = ft_vec4f(1, 0.2, 0.4, 0);
+	add_sphere (&rt, ft_vec3f (0, 1, 20), 5.0)->color = ft_vec4f(1, 0, 0, 0);
+	add_sphere (&rt, ft_vec3f (1, -8, 15), 2.0)->color = ft_vec4f(0, 1, 0, 0);
+	add_sphere (&rt, ft_vec3f (-10, 20, 0), 7.0)->color = ft_vec4f(0, 0, 1, 0);
+	add_plane (&rt, ft_vec3f (0, 70, 0), ft_vec3f (0, 1, 0))->color = ft_vec4f(1, 0.2, 0.4, 0);
 
 	t_object	*planet = add_sphere (&rt, ft_vec3f (0, 0, 100), 60.0);
 	planet->color = ft_vec4f(1, 0, 1, 0);
@@ -94,54 +151,56 @@ int	main(int ac, char **av)
 	obj->cylinder.radius = 3;
 	obj->color = ft_vec4f (1, 0, 0, 0);
 
-	while (rt.win.opened)
-	{
-		// t_u64	start = GetTickCount64 ();
-		// t_f32	seconds = ((t_f32)start) / 1000.0f;
+	render(&tick, &rt);
 
-		poll_window_events (&rt.win);
+	// while (rt.win.opened)
+	// {
+	// 	// t_u64	start = GetTickCount64 ();
+	// 	// t_f32	seconds = ((t_f32)start) / 1000.0f;
 
-		for (int y = 0; y < rt.win.frame_height; y += 1)
-			for (int x = 0; x < rt.win.frame_width; x += 1)
-				set_pixel (&rt.win, x, y, ft_vec4f_mulf (rt.ambient_light, rt.ambient_light.w));
+	// 	poll_window_events (&rt.win);
 
-		rt.camera.width = rt.win.frame_width;
-		rt.camera.height = rt.win.frame_height;
-		rt.camera.scale = tanf (rt.camera.fov_in_degrees * 0.5f * PI / 180.0f);
-		t_f32	speed = 1;
-		if (is_key_down (&rt.win, KEY_SHIFT))
-			speed = 10;
+	// 	for (int y = 0; y < rt.win.frame_height; y += 1)
+	// 		for (int x = 0; x < rt.win.frame_width; x += 1)
+	// 			set_pixel (&rt.win, x, y, ft_vec4f_mulf (rt.ambient_light, rt.ambient_light.w));
 
-		t_vec3f	right = ft_mat4f_right_vector (rt.camera.transform);
-		t_vec3f	up = ft_mat4f_up_vector (rt.camera.transform);
-		t_vec3f	forward = ft_mat4f_forward_vector (rt.camera.transform);
+	// 	rt.camera.width = rt.win.frame_width;
+	// 	rt.camera.height = rt.win.frame_height;
+	// 	rt.camera.scale = tanf (rt.camera.fov_in_degrees * 0.5f * PI / 180.0f);
+	// 	t_f32	speed = 1;
+	// 	if (is_key_down (&rt.win, KEY_SHIFT))
+	// 		speed = 10;
 
-		rt.camera.yaw += (is_key_down (&rt.win, KEY_RIGHT) - is_key_down (&rt.win, KEY_LEFT)) * 2;
-		rt.camera.pitch += (is_key_down (&rt.win, KEY_UP) - is_key_down (&rt.win, KEY_DOWN)) * 2;
-		rt.camera.pitch = ft_clampf (rt.camera.pitch, -80, 80);
+	// 	t_vec3f	right = ft_mat4f_right_vector (rt.camera.transform);
+	// 	t_vec3f	up = ft_mat4f_up_vector (rt.camera.transform);
+	// 	t_vec3f	forward = ft_mat4f_forward_vector (rt.camera.transform);
 
-		rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (right, (is_key_down (&rt.win, 'D') - is_key_down (&rt.win, 'A')) * speed));
-		rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (up, (is_key_down (&rt.win, 'E') - is_key_down (&rt.win, 'Q')) * speed));
-		rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (forward, (is_key_down (&rt.win, 'W') - is_key_down (&rt.win, 'S')) * speed));
+	// 	rt.camera.yaw += (is_key_down (&rt.win, KEY_RIGHT) - is_key_down (&rt.win, KEY_LEFT)) * 2;
+	// 	rt.camera.pitch += (is_key_down (&rt.win, KEY_UP) - is_key_down (&rt.win, KEY_DOWN)) * 2;
+	// 	rt.camera.pitch = ft_clampf (rt.camera.pitch, -80, 80);
 
-		rt.camera.transform = ft_mat4f_rotate (ft_vec3f (1, 0, 0), rt.camera.pitch * PI / 180.0f);
-		rt.camera.transform = ft_mat4f_mul (ft_mat4f_rotate (ft_vec3f (0, 1, 0), rt.camera.yaw * PI / 180.0f), rt.camera.transform);
-		rt.camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt.camera.position), rt.camera.transform);
+	// 	rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (right, (is_key_down (&rt.win, 'D') - is_key_down (&rt.win, 'A')) * speed));
+	// 	rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (up, (is_key_down (&rt.win, 'E') - is_key_down (&rt.win, 'Q')) * speed));
+	// 	rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (forward, (is_key_down (&rt.win, 'W') - is_key_down (&rt.win, 'S')) * speed));
 
-		rt.camera.aspect_ratio = rt.camera.width / rt.camera.height;
+	// 	rt.camera.transform = ft_mat4f_rotate (ft_vec3f (1, 0, 0), rt.camera.pitch * PI / 180.0f);
+	// 	rt.camera.transform = ft_mat4f_mul (ft_mat4f_rotate (ft_vec3f (0, 1, 0), rt.camera.yaw * PI / 180.0f), rt.camera.transform);
+	// 	rt.camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt.camera.position), rt.camera.transform);
 
-		// rt.light_position = ft_vec3f (cosf (seconds * 0.6) * 10, -100 + sinf (seconds * 0.5) * 10, cosf (seconds * 0.2) * 10);
-		// planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 200);
+	// 	rt.camera.aspect_ratio = rt.camera.width / rt.camera.height;
 
-		for (int y = 0; y < rt.win.frame_height; y += 1)
-			for (int x = 0; x < rt.win.frame_width; x += 1)
-				render_pixel (&rt, x, y);
+	// 	// rt.light_position = ft_vec3f (cosf (seconds * 0.6) * 10, -100 + sinf (seconds * 0.5) * 10, cosf (seconds * 0.2) * 10);
+	// 	// planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 200);
 
-		update_window (&rt.win);
+	// 	for (int y = 0; y < rt.win.frame_height; y += 1)
+	// 		for (int x = 0; x < rt.win.frame_width; x += 1)
+	// 			render_pixel (&rt, x, y);
 
-		// ft_println ("%u", GetTickCount64 () - start);
-		Sleep (10);
-	}
+	// 	update_window (&rt.win);
+
+	// 	// ft_println ("%u", GetTickCount64 () - start);
+	// 	Sleep (10);
+	// }
 	destroy_window (&rt.win);
 	return (0);
 }

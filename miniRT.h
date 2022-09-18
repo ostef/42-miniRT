@@ -121,4 +121,6 @@ t_hit_result	raycast_first(t_rt *rt, t_ray ray);
 t_hit_result	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore);
 t_hit_result	raycast_closest(t_rt *rt, t_ray ray);
 
+void	render(int (*f)(t_rt *), t_rt *rt);
+
 #endif

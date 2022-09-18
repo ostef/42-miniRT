@@ -10,10 +10,10 @@ LIBS = ft ft_math
 
 ifdef OS
 NAME = $(WINDOWS_NAME)
-SRC_FILES += win32_layer/window.c win32_layer/input.c
+SRC_FILES += win32_layer/window.c win32_layer/input.c win32_layer/render.c
 else
 NAME = $(UNIX_NAME)
-SRC_FILES += mlx_layer/window.c mlx_layer/input.c
+SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/render.c
 INCLUDE_DIRS += mlx
 LIB_DIRS += mlx
 LIBS += mlx

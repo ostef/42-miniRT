@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 14:31:26 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/14 17:47:17 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/16 14:34:12 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ t_bool	create_window(t_window *win, t_str title, int width, int height)
 	win->frame_width = width;
 	win->frame_height = height;
 	win->opened = TRUE;
+	init_events(win);
 	return (TRUE);
 }
 
