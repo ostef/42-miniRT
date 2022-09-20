@@ -23,6 +23,18 @@
 #  include "minilibx_layer.h"
 # endif
 
+t_bool	create_window(t_window *win, t_cstr title, int width, int height);
+void	destroy_window(t_window *win);
+void	main_loop(t_window *win, int (*f)(void *), void *data);
+void	set_pixel(t_window *win, int x, int y, t_vec4f color);
+t_vec4f	get_pixel(t_window *win, int x, int y);
+
+t_vec2f	get_mouse_pos(t_window *win);
+t_bool	was_key_down(t_window *win, t_key key);
+t_bool	is_key_down(t_window *win, t_key key);
+t_bool	is_key_pressed(t_window *win, t_key key);
+t_bool	is_key_released(t_window *win, t_key key);
+
 typedef enum e_shape
 {
 	UNKNOWN_SHAPE = 0,
@@ -99,10 +111,8 @@ t_object	*add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius);
 t_object	*add_plane(t_rt *rt, t_vec3f origin, t_vec3f normal);
 void		remove_object(t_rt *rt, t_s64 index);
 
-
 t_rt		parsing(t_str filename);
 
-// t_bool		ray_sphere_intersection(t_ray ray, t_sphere sph, t_f32 *out_dist);
 typedef struct s_hit_result
 {
 	t_vec3f		normal;
@@ -120,7 +130,5 @@ t_bool		ray_object_intersection(t_ray ray, t_object *obj, t_hit_result *res);
 t_hit_result	raycast_first(t_rt *rt, t_ray ray);
 t_hit_result	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore);
 t_hit_result	raycast_closest(t_rt *rt, t_ray ray);
-
-void	render(int (*f)(t_rt *), t_rt *rt);
 
 #endif

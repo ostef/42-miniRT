@@ -24,21 +24,9 @@ typedef struct s_window
 	t_s64		frame_height;
 	void		*pixels;
 	t_bool		opened;
+	t_bool		prev_key_states[256];
+	t_bool		curr_key_states[256];
 }	t_window;
-
-typedef struct s_keyboard_state
-{
-	t_bool	prev[256];
-	t_bool	curr[256];
-}	t_keyboard_state;
-
-t_bool	create_window(t_window *win, t_cstr title, int width, int height);
-void	destroy_window(t_window *win);
-t_bool	allocate_framebuffer(t_window *win, t_int width, t_int height);
-void	poll_window_events(t_window *win);
-void	update_window(t_window *win);
-
-void	set_pixel(t_window *win, int x, int y, t_vec4f color);
 
 typedef enum e_key
 {
@@ -112,13 +100,5 @@ typedef enum e_key
 	KEY_LEFT_ALT = VK_LMENU,
 	KEY_RIGHT_ALT = VK_RMENU,
 }	t_key;
-
-extern t_keyboard_state	g_keys;
-
-t_vec2f	get_mouse_pos(t_window *win);
-t_bool	was_key_down(t_key key);
-t_bool	is_key_down(void *null, t_key key);
-t_bool	is_key_pressed(t_key key);
-t_bool	is_key_released(t_key key);
 
 #endif
