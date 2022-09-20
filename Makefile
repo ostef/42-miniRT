@@ -10,10 +10,10 @@ LIBS = ft ft_math
 
 ifdef OS
 NAME = $(WINDOWS_NAME)
-SRC_FILES += win32_layer/window.c win32_layer/input.c win32_layer/render.c
+SRC_FILES += win32_layer/window.c win32_layer/input.c win32_layer/loop.c
 else
 NAME = $(UNIX_NAME)
-SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/render.c
+SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/loop.c
 INCLUDE_DIRS += mlx
 LIB_DIRS += mlx
 LIBS += mlx
@@ -55,14 +55,17 @@ $(OBJ_DIR)/%.obj: $(SRC_DIR)/%.c $(DEPENDENCIES)
 	@mkdir -p $(dir $@)
 	@$(CC) $(C_FLAGS) -c $< -Fo$(dir $@)
 
-ifndef OS
-$(NAME): $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
-# $(CC) $(C_FLAGS) $(addprefix $(OBJ_DIR)/, $(OBJ_FILES)) $(addprefix -L, $(LIB_DIRS)) -o $(NAME)
-	$(CC) $(C_FLAGS) $(addprefix $(OBJ_DIR)/, $(OBJ_FILES)) libft/libft.a ft_math/libft_math.a -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
-endif
+ifdef OS
 
-%.exe: $(addprefix $(OBJ_DIR)/,$(OBJ_FILES))
+$(NAME): $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
 	cl -nologo -Fe$@ $(addprefix $(OBJ_DIR)/,$(OBJ_FILES)) $(LIB_FILES)
+
+else
+
+$(NAME): $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
+	$(CC) $(C_FLAGS) $(addprefix $(OBJ_DIR)/, $(OBJ_FILES)) libft/libft.a ft_math/libft_math.a -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+
+endif
 
 libft:
 	@ $(MAKE) -C libft
