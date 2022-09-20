@@ -38,8 +38,8 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 		(2 * (px_x + 0.5f) / rt->camera.width - 1) * rt->camera.aspect_ratio * rt->camera.scale,
 		(1 - 2 * (px_y + 0.5f) / rt->camera.height) * rt->camera.scale, 1);
 	ray.dir = ft_mat4f_transform_vector(rt->camera.transform, ft_vec3f_normalized (ray.dir));
-	if (render_sphere_for_light (rt, px_x, px_y, ray))
-		return ;
+	//if (render_sphere_for_light (rt, px_x, px_y, ray))
+	//	return ;
 	hit = raycast_closest (rt, ray);
 	if (hit.object)
 	{
