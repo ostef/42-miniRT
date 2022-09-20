@@ -132,22 +132,24 @@ t_bool	ray_plane_intersection(t_ray ray, t_plane pla, t_hit_result *res)
 {
 	t_f32	denom;
 	t_f32	t;
+	t_vec3f	norm;
 
+	norm = ft_vec3f_neg (pla.normal);
 	denom = ft_vec3f_dot (pla.normal, ray.dir);
-	if (denom > 0.0001f)
+	if (!ft_approx_zero (denom, 0.0001f))
 	{
 		t = ft_vec3f_dot (ft_vec3f_sub (pla.origin, ray.origin), pla.normal) / denom;
 		if (res)
 		{
-			res->hit = t >= 0;
+			res->hit = t > 0.0001f;
 			if (res->hit)
 			{
 				res->dist = t;
-				res->point = ft_vec3f_add (ray.origin, ft_vec3f_mulf (ray.dir, t));
-				res->normal = ft_vec3f_neg (pla.normal);
+				res->point = ft_vec3f_add (ray.origin, ft_vec3f_mulf (ray.dir, res->dist));
+				res->normal = ft_vec3f_mulf (pla.normal, -ft_signf (denom));
 			}
 		}
-		return (t >= 0);
+		return (t > 0.0001f);
 	}
 	if (res)
 		res->hit = FALSE;
