@@ -12,10 +12,25 @@
 
 #include "miniRT.h"
 
+t_bool	render_sphere_for_light(t_rt *rt, t_int px_x, t_int px_y, t_ray ray)
+{
+	t_sphere	sph;
+
+	sph.center = rt->light_position;
+	sph.radius = 1;
+	if (ray_sphere_intersection (ray, sph, NULL))
+	{
+		set_pixel (&rt->win, px_x, px_y, rt->light_color);
+		return (TRUE);
+	}
+	return (FALSE);
+}
+
 void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 {
 	t_ray			ray;
 	t_hit_result	hit;
+	t_hit_result	shadow_hit;
 	t_f32			diffuse_intensity;
 
 	ray.origin = rt->camera.position;
@@ -23,13 +38,16 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 		(2 * (px_x + 0.5f) / rt->camera.width - 1) * rt->camera.aspect_ratio * rt->camera.scale,
 		(1 - 2 * (px_y + 0.5f) / rt->camera.height) * rt->camera.scale, 1);
 	ray.dir = ft_mat4f_transform_vector(rt->camera.transform, ft_vec3f_normalized (ray.dir));
+	if (render_sphere_for_light (rt, px_x, px_y, ray))
+		return ;
 	hit = raycast_closest (rt, ray);
 	if (hit.object)
 	{
 		t_vec3f	point_to_light = ft_vec3f_normalized (ft_vec3f_sub (rt->light_position, hit.point));
 		ray.origin = hit.point;
 		ray.dir = point_to_light;
-		if (raycast_first_except (rt, ray, hit.object).hit)
+		shadow_hit = raycast_closest_except (rt, ray, hit.object);
+		if (shadow_hit.hit && shadow_hit.dist < ft_vec3f_dist (rt->light_position, ray.origin))
 			diffuse_intensity = 0;
 		else
 			diffuse_intensity = ft_maxf (ft_vec3f_dot (hit.normal, point_to_light), 0);
@@ -110,7 +128,6 @@ int	main(int ac, char **av)
 {
 	t_rt	rt;
 
-	(void)av;
 	if (ac < 2 || ac > 3)
 		return (1);
 	ft_memset (&rt, 0, sizeof (rt));

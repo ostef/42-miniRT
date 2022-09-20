@@ -130,5 +130,6 @@ t_bool		ray_object_intersection(t_ray ray, t_object *obj, t_hit_result *res);
 t_hit_result	raycast_first(t_rt *rt, t_ray ray);
 t_hit_result	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore);
 t_hit_result	raycast_closest(t_rt *rt, t_ray ray);
+t_hit_result	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore);
 
 #endif
