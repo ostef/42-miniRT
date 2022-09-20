@@ -35,6 +35,10 @@ t_bool		is_key_down(t_window *win, t_key key);
 t_bool		is_key_pressed(t_window *win, t_key key);
 t_bool		is_key_released(t_window *win, t_key key);
 
+t_thread	create_thread(int (*f)(void *), void *data);
+void		destroy_thread(t_thread t);
+void		wait_for_all_threads(t_thread *t, t_s64 n);
+
 typedef enum e_shape
 {
 	UNKNOWN_SHAPE = 0,

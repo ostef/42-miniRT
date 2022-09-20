@@ -101,4 +101,6 @@ typedef enum e_key
 	KEY_RIGHT_ALT = VK_RMENU,
 }	t_key;
 
+typedef HANDLE	t_thread;
+
 #endif

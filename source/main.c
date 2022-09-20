@@ -49,7 +49,6 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 
 int	tick(t_rt *rt)
 {
-
 	int	x;
 	int	y;
 

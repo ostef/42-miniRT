@@ -10,7 +10,7 @@ LIBS = ft ft_math
 
 ifdef OS
 
-SRC_FILES += win32_layer/window.c win32_layer/input.c win32_layer/loop.c
+SRC_FILES += win32_layer/window.c win32_layer/input.c win32_layer/loop.c win32_layer/threads.c
 
 else
 

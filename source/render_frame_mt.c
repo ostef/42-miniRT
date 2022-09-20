@@ -29,7 +29,7 @@ typedef struct s_thread_data
 	t_int	y1;
 }	t_thread_data;
 
-static DWORD	render_thread(void *param)
+static int	render_thread(void *param)
 {
 	t_thread_data	data;
 	int				x;
@@ -65,14 +65,10 @@ void	render_frame(t_rt *rt)
 			thread_data[i].x1 = (x + 1) * rt->win.frame_width / THREAD_X_COUNT;
 			thread_data[i].y0 = y * rt->win.frame_height / THREAD_Y_COUNT;
 			thread_data[i].y1 = (y + 1) * rt->win.frame_height / THREAD_Y_COUNT;
-			threads[i] = CreateThread (NULL, 0, render_thread, &thread_data[i], 0, NULL);
+			threads[i] = create_thread (&render_thread, &thread_data[i]);
 		}
 	}
-
-	WaitForMultipleObjects(THREAD_COUNT, threads, TRUE, INFINITE);
-
+	wait_for_threads(threads, THREAD_COUNT);
 	for (int i = 0; i < THREAD_COUNT; i += 1)
-	{
-		CloseHandle (threads[i]);
-	}
+		destroy_thread (threads[i]);
 }
