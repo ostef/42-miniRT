@@ -63,8 +63,43 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	}
 }
 
+typedef struct s_thread_data
+{
+	t_rt	*rt;
+	t_int	x0;
+	t_int	y0;
+	t_int	x1;
+	t_int	y1;
+}	t_thread_data;
+
+DWORD	render_thread(void *param)
+{
+	t_thread_data	data;
+	int				x;
+	int				y;
+	
+	data = *(t_thread_data *)param;
+	y = data.y0;
+	while (y < data.y1)
+	{
+		x = data.x0;
+		while (x < data.x1)
+		{
+			render_pixel (data.rt, x, y);
+			x += 1;
+		}
+		y += 1;
+	}
+	return (0);
+}
+
+#define THREAD_X_COUNT (4)
+#define THREAD_Y_COUNT (4)
+#define THREAD_COUNT (THREAD_X_COUNT * THREAD_Y_COUNT)
+
 int	tick(t_rt *rt)
 {
+
 	int	x;
 	int	y;
 
@@ -108,6 +143,31 @@ int	tick(t_rt *rt)
 	// rt->light_position = ft_vec3f (cosf (seconds * 0.6) * 10, -100 + sinf (seconds * 0.5) * 10, cosf (seconds * 0.2) * 10);
 	// planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 200);
 
+	HANDLE	threads[THREAD_COUNT] = {0};
+	t_thread_data	thread_data[THREAD_COUNT] = {0};
+
+	for (int y = 0; y < THREAD_Y_COUNT; y += 1)
+	{
+		for (int x = 0; x < THREAD_X_COUNT; x += 1)
+		{
+			int i = y * THREAD_X_COUNT + x;
+			thread_data[i].rt = rt;
+			thread_data[i].x0 = x * rt->win.frame_width / THREAD_X_COUNT;
+			thread_data[i].x1 = (x + 1) * rt->win.frame_width / THREAD_X_COUNT;
+			thread_data[i].y0 = y * rt->win.frame_height / THREAD_Y_COUNT;
+			thread_data[i].y1 = (y + 1) * rt->win.frame_height / THREAD_Y_COUNT;
+			threads[i] = CreateThread (NULL, 0, render_thread, &thread_data[i], 0, NULL);
+		}
+	}
+
+	WaitForMultipleObjects(THREAD_COUNT, threads, TRUE, INFINITE);
+
+	for (int i = 0; i < THREAD_COUNT; i += 1)
+	{
+		CloseHandle (threads[i]);
+	}
+
+	/*
 	y = 0;
 	while (y < rt->win.frame_height)
 	{
@@ -119,6 +179,7 @@ int	tick(t_rt *rt)
 		}
 		y += 1;
 	}
+	*/
 
 	return (0);
 }
