@@ -12,20 +12,6 @@
 
 #include "miniRT.h"
 
-t_bool	render_sphere_for_light(t_rt *rt, t_int px_x, t_int px_y, t_ray ray)
-{
-	t_sphere	sph;
-
-	sph.center = rt->light_position;
-	sph.radius = 1;
-	if (ray_sphere_intersection (ray, sph, NULL))
-	{
-		set_pixel (&rt->win, px_x, px_y, rt->light_color);
-		return (TRUE);
-	}
-	return (FALSE);
-}
-
 void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 {
 	t_ray		ray;
@@ -38,8 +24,6 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 		(2 * (px_x + 0.5f) / rt->camera.width - 1) * rt->camera.aspect_ratio * rt->camera.scale,
 		(1 - 2 * (px_y + 0.5f) / rt->camera.height) * rt->camera.scale, 1);
 	ray.dir = ft_mat4f_transform_vector(rt->camera.transform, ft_vec3f_normalized (ray.dir));
-	//if (render_sphere_for_light (rt, px_x, px_y, ray))
-	//	return ;
 	hit = raycast_closest (rt, ray);
 	if (hit.object)
 	{
@@ -62,40 +46,6 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 		set_pixel (&rt->win, px_x, px_y, color);
 	}
 }
-
-typedef struct s_thread_data
-{
-	t_rt	*rt;
-	t_int	x0;
-	t_int	y0;
-	t_int	x1;
-	t_int	y1;
-}	t_thread_data;
-
-DWORD	render_thread(void *param)
-{
-	t_thread_data	data;
-	int				x;
-	int				y;
-	
-	data = *(t_thread_data *)param;
-	y = data.y0;
-	while (y < data.y1)
-	{
-		x = data.x0;
-		while (x < data.x1)
-		{
-			render_pixel (data.rt, x, y);
-			x += 1;
-		}
-		y += 1;
-	}
-	return (0);
-}
-
-#define THREAD_X_COUNT (4)
-#define THREAD_Y_COUNT (4)
-#define THREAD_COUNT (THREAD_X_COUNT * THREAD_Y_COUNT)
 
 int	tick(t_rt *rt)
 {
@@ -140,47 +90,7 @@ int	tick(t_rt *rt)
 
 	rt->camera.aspect_ratio = rt->camera.width / rt->camera.height;
 
-	// rt->light_position = ft_vec3f (cosf (seconds * 0.6) * 10, -100 + sinf (seconds * 0.5) * 10, cosf (seconds * 0.2) * 10);
-	// planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 200);
-
-	HANDLE	threads[THREAD_COUNT] = {0};
-	t_thread_data	thread_data[THREAD_COUNT] = {0};
-
-	for (int y = 0; y < THREAD_Y_COUNT; y += 1)
-	{
-		for (int x = 0; x < THREAD_X_COUNT; x += 1)
-		{
-			int i = y * THREAD_X_COUNT + x;
-			thread_data[i].rt = rt;
-			thread_data[i].x0 = x * rt->win.frame_width / THREAD_X_COUNT;
-			thread_data[i].x1 = (x + 1) * rt->win.frame_width / THREAD_X_COUNT;
-			thread_data[i].y0 = y * rt->win.frame_height / THREAD_Y_COUNT;
-			thread_data[i].y1 = (y + 1) * rt->win.frame_height / THREAD_Y_COUNT;
-			threads[i] = CreateThread (NULL, 0, render_thread, &thread_data[i], 0, NULL);
-		}
-	}
-
-	WaitForMultipleObjects(THREAD_COUNT, threads, TRUE, INFINITE);
-
-	for (int i = 0; i < THREAD_COUNT; i += 1)
-	{
-		CloseHandle (threads[i]);
-	}
-
-	/*
-	y = 0;
-	while (y < rt->win.frame_height)
-	{
-		x = 0;
-		while (x < rt->win.frame_width)
-		{
-			render_pixel (rt, x, y);
-			x += 1;
-		}
-		y += 1;
-	}
-	*/
-
+	render_frame (rt);
 	return (0);
 }
 
