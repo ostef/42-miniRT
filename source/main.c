@@ -28,10 +28,10 @@ t_bool	render_sphere_for_light(t_rt *rt, t_int px_x, t_int px_y, t_ray ray)
 
 void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 {
-	t_ray			ray;
-	t_hit_result	hit;
-	t_hit_result	shadow_hit;
-	t_f32			diffuse_intensity;
+	t_ray		ray;
+	t_hit_res	hit;
+	t_hit_res	shadow_hit;
+	t_f32		diffuse_intensity;
 
 	ray.origin = rt->camera.position;
 	ray.dir = ft_vec3f (
@@ -108,7 +108,6 @@ int	tick(t_rt *rt)
 	// rt->light_position = ft_vec3f (cosf (seconds * 0.6) * 10, -100 + sinf (seconds * 0.5) * 10, cosf (seconds * 0.2) * 10);
 	// planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 200);
 
-	
 	y = 0;
 	while (y < rt->win.frame_height)
 	{

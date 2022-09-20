@@ -12,10 +12,10 @@
 
 #include "miniRT.h"
 
-t_hit_result	raycast_first(t_rt *rt, t_ray ray)
+t_hit_res	raycast_first(t_rt *rt, t_ray ray)
 {
-	t_hit_result	hit;
-	t_s64			i;
+	t_hit_res	hit;
+	t_s64		i;
 
 	ft_memset (&hit, 0, sizeof (hit));
 	i = 0;
@@ -28,10 +28,10 @@ t_hit_result	raycast_first(t_rt *rt, t_ray ray)
 	return (hit);
 }
 
-t_hit_result	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore)
+t_hit_res	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore)
 {
-	t_hit_result	hit;
-	t_s64			i;
+	t_hit_res	hit;
+	t_s64		i;
 
 	ft_memset (&hit, 0, sizeof (hit));
 	i = 0;
@@ -49,11 +49,11 @@ t_hit_result	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore)
 	return (hit);
 }
 
-t_hit_result	raycast_closest(t_rt *rt, t_ray ray)
+t_hit_res	raycast_closest(t_rt *rt, t_ray ray)
 {
-	t_hit_result	hit;
-	t_hit_result	closest;
-	t_s64			i;
+	t_hit_res	hit;
+	t_hit_res	closest;
+	t_s64		i;
 
 	ft_memset (&hit, 0, sizeof (hit));
 	ft_memset (&closest, 0, sizeof (closest));
@@ -70,11 +70,11 @@ t_hit_result	raycast_closest(t_rt *rt, t_ray ray)
 }
 
 
-t_hit_result	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore)
+t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore)
 {
-	t_hit_result	hit;
-	t_hit_result	closest;
-	t_s64			i;
+	t_hit_res	hit;
+	t_hit_res	closest;
+	t_s64		i;
 
 	ft_memset (&hit, 0, sizeof (hit));
 	ft_memset (&closest, 0, sizeof (closest));
