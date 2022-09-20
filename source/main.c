@@ -101,11 +101,11 @@ int	tick(t_rt *rt)
 					rt->selected_object -= 1;
 			}
 		}
-		if (is_key_pressed (&rt->win, KEY_PLUS))
+		if (is_key_pressed (&rt->win, KEY_PLUS) && rt->selected_object)
 		{
 			rt->selected_object = add_sphere (rt, ft_vec3f(0,0,0), 1);
 		}
-		if (is_key_pressed (&rt->win, KEY_MINUS))
+		if (is_key_pressed (&rt->win, KEY_MINUS) && rt->selected_object)
 		{
 			remove_object (rt, rt->selected_object - rt->objs);
 			if (rt->selected_object >= rt->objs + rt->obj_count)
