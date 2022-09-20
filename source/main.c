@@ -27,19 +27,28 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	hit = raycast_closest (rt, ray);
 	if (hit.object)
 	{
-		t_vec3f	point_to_light = ft_vec3f_normalized (ft_vec3f_sub (rt->light_position, hit.point));
-		ray.origin = hit.point;
-		ray.dir = point_to_light;
-		shadow_hit = raycast_closest_except (rt, ray, hit.object);
-		if (shadow_hit.hit && shadow_hit.dist < ft_vec3f_dist (rt->light_position, ray.origin))
-			diffuse_intensity = 0;
+		t_vec4f	color;
+		if (rt->selected_object == hit.object)
+		{
+			diffuse_intensity = 1;
+			color = ft_vec4f (1, 1, 1, 1);
+		}
 		else
-			diffuse_intensity = ft_maxf (ft_vec3f_dot (hit.normal, point_to_light), 0);
+		{
+			t_vec3f	point_to_light = ft_vec3f_normalized (ft_vec3f_sub (rt->light_position, hit.point));
+			ray.origin = hit.point;
+			ray.dir = point_to_light;
+			shadow_hit = raycast_closest_except (rt, ray, hit.object);
+			if (shadow_hit.hit && shadow_hit.dist < ft_vec3f_dist (rt->light_position, ray.origin))
+				diffuse_intensity = 0;
+			else
+				diffuse_intensity = ft_maxf (ft_vec3f_dot (hit.normal, point_to_light), 0);
+			color = hit.object->color;
+		}
 
 		t_vec4f	diffuse = ft_vec4f_mulf (rt->light_color, rt->light_color.w * diffuse_intensity);
 		t_vec4f	ambient = ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w);
 		t_vec4f	light = ft_vec4f_add (diffuse, ambient);
-		t_vec4f	color = hit.object->color;
 		color.r *= light.r;
 		color.g *= light.g;
 		color.b *= light.b;
@@ -64,30 +73,80 @@ int	tick(t_rt *rt)
 		y += 1;
 	}
 
-	rt->camera.width = rt->win.frame_width;
-	rt->camera.height = rt->win.frame_height;
-	rt->camera.scale = tanf (rt->camera.fov_in_degrees * 0.5f * PI / 180.0f);
-	t_f32	speed = 1;
-	if (is_key_down (&rt->win, KEY_SHIFT))
-		speed = 10;
+	if (rt->is_editing)
+	{
+		if (is_key_pressed (&rt->win, KEY_SPACE))
+		{
+			rt->is_editing = FALSE;
+			rt->selected_object = NULL;
+		}
+		if (rt->obj_count > 0)
+		{
+			if (is_key_pressed (&rt->win, KEY_RIGHT) || is_key_pressed (&rt->win, KEY_UP))
+			{
+				if (!rt->selected_object)
+					rt->selected_object = rt->objs;
+				else if (rt->selected_object == rt->objs + rt->obj_count - 1)
+					rt->selected_object = NULL;
+				else
+					rt->selected_object += 1;
+			}
+			if (is_key_pressed (&rt->win, KEY_LEFT) || is_key_pressed (&rt->win, KEY_DOWN))
+			{
+				if (!rt->selected_object)
+					rt->selected_object = rt->objs + rt->obj_count - 1;
+				else if (rt->selected_object == rt->objs)
+					rt->selected_object = NULL;
+				else
+					rt->selected_object -= 1;
+			}
+		}
+		if (is_key_pressed (&rt->win, KEY_PLUS))
+		{
+			rt->selected_object = add_sphere (rt, ft_vec3f(0,0,0), 1);
+		}
+		if (is_key_pressed (&rt->win, KEY_MINUS))
+		{
+			remove_object (rt, rt->selected_object - rt->objs);
+			if (rt->selected_object >= rt->objs + rt->obj_count)
+				rt->selected_object -= 1;;
+			if (rt->selected_object < rt->objs)
+				rt->selected_object = NULL;
+		}
+	}
+	else
+	{
+		if (is_key_pressed (&rt->win, KEY_SPACE))
+		{
+			rt->is_editing = TRUE;
+			rt->selected_object = NULL;
+		}
 
-	t_vec3f	right = ft_mat4f_right_vector (rt->camera.transform);
-	t_vec3f	up = ft_mat4f_up_vector (rt->camera.transform);
-	t_vec3f	forward = ft_mat4f_forward_vector (rt->camera.transform);
+		rt->camera.width = rt->win.frame_width;
+		rt->camera.height = rt->win.frame_height;
+		rt->camera.scale = tanf (rt->camera.fov_in_degrees * 0.5f * PI / 180.0f);
+		t_f32	speed = 1;
+		if (is_key_down (&rt->win, KEY_SHIFT))
+			speed = 10;
 
-	rt->camera.yaw += (is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT)) * 2;
-	rt->camera.pitch += (is_key_down (&rt->win, KEY_UP) - is_key_down (&rt->win, KEY_DOWN)) * 2;
-	rt->camera.pitch = ft_clampf (rt->camera.pitch, -80, 80);
+		t_vec3f	right = ft_mat4f_right_vector (rt->camera.transform);
+		t_vec3f	up = ft_mat4f_up_vector (rt->camera.transform);
+		t_vec3f	forward = ft_mat4f_forward_vector (rt->camera.transform);
 
-	rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (right, (is_key_down (&rt->win, 'D') - is_key_down (&rt->win, 'A')) * speed));
-	rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (up, (is_key_down (&rt->win, 'E') - is_key_down (&rt->win, 'Q')) * speed));
-	rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (forward, (is_key_down (&rt->win, 'W') - is_key_down (&rt->win, 'S')) * speed));
+		rt->camera.yaw += (is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT)) * 2;
+		rt->camera.pitch += (is_key_down (&rt->win, KEY_UP) - is_key_down (&rt->win, KEY_DOWN)) * 2;
+		rt->camera.pitch = ft_clampf (rt->camera.pitch, -80, 80);
 
-	rt->camera.transform = ft_mat4f_rotate (ft_vec3f (1, 0, 0), rt->camera.pitch * PI / 180.0f);
-	rt->camera.transform = ft_mat4f_mul (ft_mat4f_rotate (ft_vec3f (0, 1, 0), rt->camera.yaw * PI / 180.0f), rt->camera.transform);
-	rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt->camera.position), rt->camera.transform);
+		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (right, (is_key_down (&rt->win, 'D') - is_key_down (&rt->win, 'A')) * speed));
+		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (up, (is_key_down (&rt->win, 'E') - is_key_down (&rt->win, 'Q')) * speed));
+		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (forward, (is_key_down (&rt->win, 'W') - is_key_down (&rt->win, 'S')) * speed));
 
-	rt->camera.aspect_ratio = rt->camera.width / rt->camera.height;
+		rt->camera.transform = ft_mat4f_rotate (ft_vec3f (1, 0, 0), rt->camera.pitch * PI / 180.0f);
+		rt->camera.transform = ft_mat4f_mul (ft_mat4f_rotate (ft_vec3f (0, 1, 0), rt->camera.yaw * PI / 180.0f), rt->camera.transform);
+		rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt->camera.position), rt->camera.transform);
+
+		rt->camera.aspect_ratio = rt->camera.width / rt->camera.height;
+	}
 
 	render_frame (rt);
 	return (0);

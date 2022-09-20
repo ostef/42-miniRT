@@ -107,6 +107,8 @@ typedef struct s_rt
 	t_object	*objs;
 	t_s64		obj_count;
 	t_s64		obj_cap;
+	t_bool		is_editing;
+	t_object	*selected_object;
 }	t_rt;
 
 t_object	*add_object(t_rt *rt);
