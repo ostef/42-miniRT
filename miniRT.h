@@ -113,7 +113,7 @@ void		remove_object(t_rt *rt, t_s64 index);
 
 t_rt		parsing(t_str filename);
 
-typedef struct s_hit_result
+typedef struct s_hit_res
 {
 	t_vec3f		normal;
 	t_vec3f		point;
