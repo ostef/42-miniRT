@@ -16,17 +16,19 @@
 # error "Multithreaded rendering is only implemented on Windows for now."
 #endif
 
-# define THREAD_X_COUNT (4)
-# define THREAD_Y_COUNT (4)
-# define THREAD_COUNT (THREAD_X_COUNT * THREAD_Y_COUNT)
+#ifndef THREADS_X
+# define THREADS_X 4
+#endif
+
+#ifndef THREADS_Y
+# define THREADS_Y 4
+#endif
 
 typedef struct s_thread_data
 {
 	t_rt	*rt;
-	t_int	x0;
-	t_int	y0;
-	t_int	x1;
-	t_int	y1;
+	t_int	x;
+	t_int	y;
 }	t_thread_data;
 
 static int	render_thread(void *param)
@@ -34,15 +36,15 @@ static int	render_thread(void *param)
 	t_thread_data	data;
 	int				x;
 	int				y;
-	
+
 	data = *(t_thread_data *)param;
-	y = data.y0;
-	while (y < data.y1)
+	y = 0;
+	while (y < data.rt->win.frame_height / THREADS_Y)
 	{
-		x = data.x0;
-		while (x < data.x1)
+		x = 0;
+		while (x < data.rt->win.frame_width / THREADS_X)
 		{
-			render_pixel (data.rt, x, y);
+			render_pixel (data.rt, data.x + x, data.y + y);
 			x += 1;
 		}
 		y += 1;
@@ -52,23 +54,28 @@ static int	render_thread(void *param)
 
 void	render_frame(t_rt *rt)
 {
-	HANDLE	threads[THREAD_COUNT] = {0};
-	t_thread_data	thread_data[THREAD_COUNT] = {0};
+	HANDLE			threads[THREADS_X * THREADS_Y];
+	t_thread_data	d[THREADS_X * THREADS_Y];
+	int				x;
+	int				y;
 
-	for (int y = 0; y < THREAD_Y_COUNT; y += 1)
+	y = 0;
+	while (y < THREADS_Y)
 	{
-		for (int x = 0; x < THREAD_X_COUNT; x += 1)
+		x = 0;
+		while (x < THREADS_X)
 		{
-			int i = y * THREAD_X_COUNT + x;
-			thread_data[i].rt = rt;
-			thread_data[i].x0 = x * rt->win.frame_width / THREAD_X_COUNT;
-			thread_data[i].x1 = (x + 1) * rt->win.frame_width / THREAD_X_COUNT;
-			thread_data[i].y0 = y * rt->win.frame_height / THREAD_Y_COUNT;
-			thread_data[i].y1 = (y + 1) * rt->win.frame_height / THREAD_Y_COUNT;
-			threads[i] = create_thread (&render_thread, &thread_data[i]);
+			d[y * THREADS_X + x].rt = rt;
+			d[y * THREADS_X + x].x = x * rt->win.frame_width / THREADS_X;
+			d[y * THREADS_X + x].y = y * rt->win.frame_height / THREADS_Y;
+			threads[y * THREADS_X + x] = create_thread (
+					&render_thread, &d[y * THREADS_X + x]);
+			x += 1;
 		}
+		y += 1;
 	}
-	wait_for_threads(threads, THREAD_COUNT);
-	for (int i = 0; i < THREAD_COUNT; i += 1)
-		destroy_thread (threads[i]);
+	wait_for_threads(threads, THREADS_X * THREADS_Y);
+	x = 0;
+	while (x < THREADS_X * THREADS_Y)
+		destroy_thread (threads[x++]);
 }

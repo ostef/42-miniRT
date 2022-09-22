@@ -13,7 +13,7 @@
 #ifndef MINIRT_H
 # define MINIRT_H
 
-#include <stdio.h>
+# include <stdio.h>
 # include <math.h>
 # include "libft.h"
 # include "ft_math.h"
@@ -132,7 +132,8 @@ typedef struct s_hit_res
 }	t_hit_res;
 
 t_bool		ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_res *res);
-t_bool		ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_res *res);
+t_bool		ray_cylinder_intersection(t_ray ray, t_cylinder cyl,
+				t_hit_res *res);
 t_bool		ray_plane_intersection(t_ray ray, t_plane pla, t_hit_res *res);
 t_bool		ray_object_intersection(t_ray ray, t_object *obj, t_hit_res *res);
 

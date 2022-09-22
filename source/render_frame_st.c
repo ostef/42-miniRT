@@ -16,7 +16,7 @@ void	render_frame(t_rt *rt)
 {
 	int	x;
 	int	y;
-	
+
 	y = 0;
 	while (y < rt->win.frame_height)
 	{
