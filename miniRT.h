@@ -116,6 +116,8 @@ t_object	*add_sphere(t_rt *rt, t_vec3f center, t_f32 radius);
 t_object	*add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius);
 t_object	*add_plane(t_rt *rt, t_vec3f origin, t_vec3f normal);
 void		remove_object(t_rt *rt, t_s64 index);
+void		translate_object(t_object *obj, t_vec3f amount);
+void		rotate_object(t_object *obj, t_vec3f amount);
 
 t_rt		parsing(t_str filename);
 void		render_frame(t_rt *rt);
@@ -138,6 +140,5 @@ t_hit_res	raycast_first(t_rt *rt, t_ray ray);
 t_hit_res	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore);
 t_hit_res	raycast_closest(t_rt *rt, t_ray ray);
 t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore);
-
 
 #endif

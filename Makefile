@@ -2,7 +2,7 @@
 # so this is how we know we're on Windows
 
 SRC_DIR = source
-SRC_FILES = main.c objects.c intersection.c parsing.c raycast.c
+SRC_FILES = main.c objects.c transform.c intersection.c parsing.c raycast.c
 OBJ_DIR = obj
 INCLUDE_DIRS = libft ft_math .
 LIB_DIRS = libft ft_math
@@ -56,7 +56,9 @@ $(OBJ_DIR)/%.obj: $(SRC_DIR)/%.c $(DEPENDENCIES)
 $(NAME): $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
 	cl -nologo -Fe$(NAME) $? $(LIB_FILES)
 
-bonus: $(addprefix $(OBJ_DIR)/, $(BONUS_OBJ_FILES))
+bonus: libft ft_math bonus_exe
+
+bonus_exe: $(addprefix $(OBJ_DIR)/, $(BONUS_OBJ_FILES))
 	cl -nologo -Fe$(NAME) $? $(LIB_FILES)
 
 else
@@ -70,7 +72,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPENDENCIES)
 $(NAME): $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
 	$(CC) $(C_FLAGS) $? libft/libft.a ft_math/libft_math.a -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
-bonus: $(addprefix $(OBJ_DIR)/, $(BONUS_OBJ_FILES))
+bonus: libft ft_math mlx bonus_exe
+
+bonus_exe: $(addprefix $(OBJ_DIR)/, $(BONUS_OBJ_FILES))
 	$(CC) $(C_FLAGS) $? libft/libft.a ft_math/libft_math.a -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
 endif
@@ -92,4 +96,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all libft ft_math clean fclean re bonus
+.PHONY: all libft ft_math clean fclean re bonus bonus_exe
