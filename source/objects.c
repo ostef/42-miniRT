@@ -17,7 +17,7 @@ t_object	*add_object(t_rt *rt)
 	if (rt->obj_count == rt->obj_cap)
 	{
 		rt->objs = ft_realloc (rt->objs, rt->obj_cap * sizeof(t_object),
-			(rt->obj_cap * 2 + 8) * sizeof(t_object), ft_heap());
+				(rt->obj_cap * 2 + 8) * sizeof(t_object), ft_heap());
 		rt->obj_cap = rt->obj_cap * 2 + 8;
 	}
 	rt->obj_count += 1;

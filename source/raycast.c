@@ -69,7 +69,6 @@ t_hit_res	raycast_closest(t_rt *rt, t_ray ray)
 	return (closest);
 }
 
-
 t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore)
 {
 	t_hit_res	hit;
@@ -94,4 +93,3 @@ t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore)
 	}
 	return (closest);
 }
-
