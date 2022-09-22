@@ -21,7 +21,7 @@ on the ray
 	thc = distance from the projection of the sphere center on the ray, to the
 intersection point along the ray
 */
-t_bool	ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_result *res)
+t_bool	ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_res *res)
 {
 	t_vec3f	l;
 	t_f32	tca;
@@ -51,9 +51,9 @@ t_bool	ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_result *res)
 	return (dist >= 0);
 }
 
-t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_result *res)
+t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_res *res)
 {
-	// t_hit_result	tmp_hit;
+	// t_hit_res	tmp_hit;
 	// t_plane			pla;
 
 	t_vec3f	pa;
@@ -128,33 +128,33 @@ t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_result *res)
 	return (FALSE);
 }
 
-t_bool	ray_plane_intersection(t_ray ray, t_plane pla, t_hit_result *res)
+t_bool	ray_plane_intersection(t_ray ray, t_plane pla, t_hit_res *res)
 {
 	t_f32	denom;
 	t_f32	t;
 
 	denom = ft_vec3f_dot (pla.normal, ray.dir);
-	if (denom > 0.0001f)
+	if (!ft_approx_zero (denom, 0.0001f))
 	{
 		t = ft_vec3f_dot (ft_vec3f_sub (pla.origin, ray.origin), pla.normal) / denom;
 		if (res)
 		{
-			res->hit = t >= 0;
+			res->hit = t > 0.0001f;
 			if (res->hit)
 			{
 				res->dist = t;
-				res->point = ft_vec3f_add (ray.origin, ft_vec3f_mulf (ray.dir, t));
-				res->normal = ft_vec3f_neg (pla.normal);
+				res->point = ft_vec3f_add (ray.origin, ft_vec3f_mulf (ray.dir, res->dist));
+				res->normal = ft_vec3f_mulf (pla.normal, -ft_signf (denom));
 			}
 		}
-		return (t >= 0);
+		return (t > 0.0001f);
 	}
 	if (res)
 		res->hit = FALSE;
 	return (FALSE);
 }
 
-t_bool	ray_object_intersection(t_ray ray, t_object *obj, t_hit_result *res)
+t_bool	ray_object_intersection(t_ray ray, t_object *obj, t_hit_res *res)
 {
 	t_bool	hit;
 

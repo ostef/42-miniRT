@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 13:49:37 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/16 14:28:44 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/22 17:11:24 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,18 +150,18 @@ typedef struct s_window
 
 // typedef struct s_rt t_rt;
 
-t_bool	create_window(t_window *win, t_str title, int width, int height);
-void	destroy_window(t_window *win);
-// t_bool	allocate_framebuffer(t_window *win, t_int width, t_int height);
-void	poll_window_events(t_window *win);
-void	update_window(t_window *win);
+// t_bool	create_window(t_window *win, t_str title, int width, int height);
+// void	destroy_window(t_window *win);
+// // t_bool	allocate_framebuffer(t_window *win, t_int width, t_int height);
+// void	poll_window_events(t_window *win);
+// void	update_window(t_window *win);
 
-void	set_pixel(t_window *win, int x, int y, t_vec4f color);
+// void	set_pixel(t_window *win, int x, int y, t_vec4f color);
 
 // INPUTS
 
 void	init_events(t_window *win);
-t_vec2f	get_mouse_pos(t_window *win);
-t_bool	is_key_down(t_window *win, int code);
+// t_vec2f	get_mouse_pos(t_window *win);
+// t_bool	is_key_down(t_window *win, int code);
 
 #endif

@@ -3,6 +3,7 @@
 *.out
 *.a
 *.lib
+miniRT
 *.exe
 .vscode/
 obj/

@@ -10,16 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "win32_layer.h"
+#include "miniRT.h"
 
-void	set_pixel(t_rt *rt, int x, int y, t_vec4f color)
+static t_bool	alloc_framebuffer(t_window *win, t_int width, t_int height)
 {
-	color.x = ft_clampf (color.x, 0, 1);
-	color.y = ft_clampf (color.y, 0, 1);
-	color.z = ft_clampf (color.z, 0, 1);
-	((t_u32 *)rt->win.pixels)[y * rt->win.frame_width + x] =
-			(((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
-			| ((t_u8)(color.z * 255));
+	if (win->pixels)
+		ft_free (win->pixels, ft_heap());
+	win->pixels = ft_alloc (width * height * 4, ft_heap());
+	if (!win->pixels)
+		return (FALSE);
+	win->frame_width = width;
+	win->frame_height = height;
+	return (TRUE);
 }
 
 static LRESULT	wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -33,35 +35,31 @@ static LRESULT	wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	if (msg == WM_SIZE)
 	{
 		GetClientRect (win->hwnd, &rect);
-		allocate_framebuffer (win, rect.right - rect.left, rect.bottom - rect.top);
+		alloc_framebuffer (win, rect.right - rect.left, rect.bottom - rect.top);
 	}
 	else if (msg == WM_CLOSE)
 		win->opened = FALSE;
 	return (DefWindowProcA (hwnd, msg, wparam, lparam));
 }
 
-static t_bool	register_wndclass(void)
+t_bool	create_window(t_window *win, t_cstr title, int width, int height)
 {
 	static t_bool		registered;
 	static WNDCLASSA	wndclass;
+	RECT				rect;
 
-	if (registered)
-		return (TRUE);
-	ft_memset (&wndclass, 0, sizeof (WNDCLASSA));
-	wndclass.style = CS_OWNDC;
-	wndclass.lpfnWndProc = wndproc;
-	wndclass.hInstance = GetModuleHandleA (NULL);
-	wndclass.lpszClassName = "WindowClass";
-	wndclass.hCursor = LoadCursorA (NULL, IDC_ARROW);
-	return (RegisterClassA (&wndclass) != 0);
-}
-
-t_bool	create_window(t_window *win, t_cstr title, int width, int height)
-{
-	RECT	rect;
-
-	if (!register_wndclass())
-		return (FALSE);
+	if (!registered)
+	{
+		wndclass.style = CS_OWNDC;
+		wndclass.lpfnWndProc = wndproc;
+		wndclass.hInstance = GetModuleHandleA (NULL);
+		wndclass.lpszClassName = "WindowClass";
+		wndclass.hCursor = LoadCursorA (NULL, IDC_ARROW);
+		if (!RegisterClassA (&wndclass))
+			return (FALSE);
+		registered = TRUE;
+	}
+	ft_memset (win, 0, sizeof (t_window));
 	win->hwnd = CreateWindowA("WindowClass", title, WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		CW_USEDEFAULT, CW_USEDEFAULT, width, height, NULL, NULL,
 		GetModuleHandleA (NULL), 0);
@@ -69,7 +67,7 @@ t_bool	create_window(t_window *win, t_cstr title, int width, int height)
 		return (FALSE);
 	SetWindowLongPtrA (win->hwnd, GWLP_USERDATA, (LONG_PTR)win);
 	GetClientRect (win->hwnd, &rect);
-	if (!allocate_framebuffer (win, rect.right - rect.left, rect.bottom - rect.top))
+	if (!alloc_framebuffer (win, rect.right - rect.left, rect.bottom - rect.top))
 		return (FALSE);
 	win->opened = TRUE;
 	return (TRUE);
@@ -80,50 +78,12 @@ void	destroy_window(t_window *win)
 	DestroyWindow (win->hwnd);
 }
 
-void	poll_window_events(t_window *win)
+void	set_pixel(t_window *win, int x, int y, t_vec4f color)
 {
-	MSG	msg;
-	int	key;
-
-	while (PeekMessageA (&msg, win->hwnd, 0, 0, PM_REMOVE))
-	{
-		TranslateMessage (&msg);
-		DispatchMessageA (&msg);
-	}
-	ft_memcpy (g_keys.prev, g_keys.curr, sizeof (g_keys.prev));
-	key = 0;
-	while (key < 256)
-	{
-		g_keys.curr[key] = is_key_down (key);
-		key += 1;
-	}
-}
-
-t_bool	allocate_framebuffer(t_window *win, t_int width, t_int height)
-{
-	if (win->pixels)
-		ft_free (win->pixels, ft_heap());
-	win->pixels = ft_alloc (width * height * 4, ft_heap());
-	if (!win->pixels)
-		return (FALSE);
-	win->frame_width = width;
-	win->frame_height = height;
-	return (TRUE);
-}
-
-void	update_window(t_window *win)
-{
-	BITMAPINFO	bmi;
-
-	ft_memset (&bmi, 0, sizeof (bmi));
-	bmi.bmiHeader.biSize = sizeof (bmi.bmiHeader);
-	bmi.bmiHeader.biWidth = win->frame_width;
-	bmi.bmiHeader.biHeight = win->frame_height;
-	bmi.bmiHeader.biPlanes = 1;
-	bmi.bmiHeader.biBitCount = 32;
-	bmi.bmiHeader.biCompression = BI_RGB;
-	StretchDIBits (GetDC (win->hwnd),
-		0, 0, win->frame_width, win->frame_height,
-		0, 0, win->frame_width, win->frame_height,
-		win->pixels, &bmi, DIB_RGB_COLORS, SRCCOPY);
+	color.x = ft_clampf (color.x, 0, 1);
+	color.y = ft_clampf (color.y, 0, 1);
+	color.z = ft_clampf (color.z, 0, 1);
+	((t_u32 *)win->pixels)[y * win->frame_width + x] =
+			(((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
+			| ((t_u8)(color.z * 255));
 }

@@ -10,9 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "win32_layer.h"
-
-t_keyboard_state	g_keys;
+#include "miniRT.h"
 
 t_vec2f	get_mouse_pos(t_window *win)
 {
@@ -23,23 +21,23 @@ t_vec2f	get_mouse_pos(t_window *win)
 	return (ft_vec2f ((t_f32)pos.x, (t_f32)pos.y));
 }
 
-t_bool	was_key_down(t_key key)
+t_bool	was_key_down(t_window *win, t_key key)
 {
-	return (g_keys.prev[key]);
+	return (win->prev_key_states[key]);
 }
 
-t_bool	is_key_down(void *null, t_key key)
+t_bool	is_key_down(t_window *win, t_key key)
 {
-	(void)null;
+	(void)win;
 	return (GetAsyncKeyState (key) & 0x8000) != 0;
 }
 
-t_bool	is_key_pressed(t_key key)
+t_bool	is_key_pressed(t_window *win, t_key key)
 {
-	return (!was_key_down (key) && is_key_down (key));
+	return (!was_key_down (win, key) && is_key_down (win, key));
 }
 
-t_bool	is_key_released(t_key key)
+t_bool	is_key_released(t_window *win, t_key key)
 {
-	return (was_key_down (key) && !is_key_down (key));
+	return (was_key_down (win, key) && !is_key_down (win, key));
 }

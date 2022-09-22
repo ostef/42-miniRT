@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 16:03:34 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/22 17:07:48 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/22 18:27:00 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ int	mouse_move(int x, int y, void *win)
 	return (0);
 }
 
-t_bool	is_key_down(t_window *win, int code)
+t_bool	is_key_down(t_window *win, t_key key)
 {
 	return (win->inputs[code]);
 }

@@ -12,21 +12,12 @@
 
 #include "miniRT.h"
 
-// void	set_pixel(t_rt *rt, int x, int y, t_vec4f color)
-// {
-// 	color.x = ft_clampf (color.x, 0, 1);
-// 	color.y = ft_clampf (color.y, 0, 1);
-// 	color.z = ft_clampf (color.z, 0, 1);
-// 	((t_u32 *)rt->win.pixels)[y * rt->win.frame_width + x] =
-// 			(((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
-// 			| ((t_u8)(color.z * 255));
-// }
-
 void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 {
-	t_ray			ray;
-	t_hit_result	hit;
-	t_f32			diffuse_intensity;
+	t_ray		ray;
+	t_hit_res	hit;
+	t_hit_res	shadow_hit;
+	t_f32		diffuse_intensity;
 
 	ray.origin = rt->camera.position;
 	ray.dir = ft_vec3f (
@@ -36,18 +27,28 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	hit = raycast_closest (rt, ray);
 	if (hit.object)
 	{
-		t_vec3f	point_to_light = ft_vec3f_normalized (ft_vec3f_sub (rt->light_position, hit.point));
-		ray.origin = hit.point;
-		ray.dir = point_to_light;
-		if (raycast_first_except (rt, ray, hit.object).hit)
-			diffuse_intensity = 0;
+		t_vec4f	color;
+		if (rt->selected_object == hit.object)
+		{
+			diffuse_intensity = 1;
+			color = ft_vec4f (1, 1, 1, 1);
+		}
 		else
-			diffuse_intensity = ft_maxf (ft_vec3f_dot (hit.normal, point_to_light), 0);
+		{
+			t_vec3f	point_to_light = ft_vec3f_normalized (ft_vec3f_sub (rt->light_position, hit.point));
+			ray.origin = hit.point;
+			ray.dir = point_to_light;
+			shadow_hit = raycast_closest_except (rt, ray, hit.object);
+			if (shadow_hit.hit && shadow_hit.dist < ft_vec3f_dist (rt->light_position, ray.origin))
+				diffuse_intensity = 0;
+			else
+				diffuse_intensity = ft_maxf (ft_vec3f_dot (hit.normal, point_to_light), 0);
+			color = hit.object->color;
+		}
 
 		t_vec4f	diffuse = ft_vec4f_mulf (rt->light_color, rt->light_color.w * diffuse_intensity);
 		t_vec4f	ambient = ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w);
 		t_vec4f	light = ft_vec4f_add (diffuse, ambient);
-		t_vec4f	color = hit.object->color;
 		color.r *= light.r;
 		color.g *= light.g;
 		color.b *= light.b;
@@ -55,20 +56,162 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	}
 }
 
+t_plane	sphere_to_plane(t_sphere sph)
+{
+	t_plane	res;
+
+	res.origin = sph.center;
+	res.normal = ft_vec3f (0, -1, 0);
+	return (res);
+}
+
+t_cylinder	sphere_to_cylinder(t_sphere sph)
+{
+	t_cylinder	res;
+
+	res.bottom = ft_vec3f_sub(sph.center, ft_vec3f(0, -sph.radius * 2, 0));
+	res.top = ft_vec3f_add(sph.center, ft_vec3f(0, -sph.radius * 2, 0));
+	res.radius = sph.radius;
+	return (res);
+}
+
+t_sphere	cylinder_to_sphere(t_cylinder cyl)
+{
+	t_sphere	res;
+
+	res.center = ft_vec3f_mulf (ft_vec3f_add (cyl.top, cyl.bottom), 0.5f);
+	res.radius = cyl.radius;
+	return (res);
+}
+
+t_plane	cylinder_to_plane(t_cylinder cyl)
+{
+	t_plane	res;
+
+	res.origin = ft_vec3f_mulf (ft_vec3f_add (cyl.top, cyl.bottom), 0.5f);
+	res.normal = ft_vec3f_normalized (ft_vec3f_sub (cyl.top, cyl.bottom));
+	return (res);
+}
+
+t_sphere	plane_to_sphere(t_plane pla)
+{
+	t_sphere	res;
+
+	res.center = pla.origin;
+	res.radius = 1;
+	return (res);
+}
+
+t_cylinder	plane_to_cylinder(t_plane pla)
+{
+	t_cylinder	res;
+
+	res.bottom = ft_vec3f_add (pla.origin, pla.normal);
+	res.top = ft_vec3f_sub (pla.origin, pla.normal);
+	res.radius = 1;
+	return (res);
+}
+
 int	tick(t_rt *rt)
 {
-	ft_fprintln (STDERR, "Tick");
+	int	x;
+	int	y;
 
-	// while (rt->win.opened)
-	// {
-		// t_u64	start = GetTickCount64 ();
-		// t_f32	seconds = ((t_f32)start) / 1000.0f;
+	y = 0;
+	while (y < rt->win.frame_height)
+	{
+		x = 0;
+		while (x < rt->win.frame_width)
+		{
+			set_pixel (&rt->win, x, y, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
+			x += 1;
+		}
+		y += 1;
+	}
 
-		// poll_window_events (&rt->win);
+	if (rt->is_editing)
+	{
+		if (is_key_pressed (&rt->win, KEY_SPACE))
+		{
+			rt->is_editing = FALSE;
+			rt->selected_object = NULL;
+		}
+		if (rt->obj_count > 0)
+		{
+			if (is_key_pressed (&rt->win, KEY_RIGHT) || is_key_pressed (&rt->win, KEY_UP))
+			{
+				if (!rt->selected_object)
+					rt->selected_object = rt->objs;
+				else if (rt->selected_object == rt->objs + rt->obj_count - 1)
+					rt->selected_object = NULL;
+				else
+					rt->selected_object += 1;
+			}
+			if (is_key_pressed (&rt->win, KEY_LEFT) || is_key_pressed (&rt->win, KEY_DOWN))
+			{
+				if (!rt->selected_object)
+					rt->selected_object = rt->objs + rt->obj_count - 1;
+				else if (rt->selected_object == rt->objs)
+					rt->selected_object = NULL;
+				else
+					rt->selected_object -= 1;
+			}
+		}
+		if (is_key_pressed (&rt->win, KEY_PLUS))
+		{
+			rt->selected_object = add_sphere (rt, ft_vec3f(0,0,0), 1);
+		}
+		if (is_key_pressed (&rt->win, KEY_MINUS) && rt->selected_object)
+		{
+			remove_object (rt, rt->selected_object - rt->objs);
+			if (rt->selected_object >= rt->objs + rt->obj_count)
+				rt->selected_object -= 1;;
+			if (rt->selected_object < rt->objs)
+				rt->selected_object = NULL;
+		}
+		if (rt->selected_object)
+		{
+			if (is_key_pressed (&rt->win, 'P'))
+			{
+				if (rt->selected_object->shape == SPHERE)
+				{
+					rt->selected_object->cylinder = sphere_to_cylinder (rt->selected_object->sphere);
+					rt->selected_object->shape = CYLINDER;
+				}
+				else if (rt->selected_object->shape == CYLINDER)
+				{
+					rt->selected_object->plane = cylinder_to_plane (rt->selected_object->cylinder);
+					rt->selected_object->shape = PLANE;
+				}
+				else if (rt->selected_object->shape == PLANE)
+				{
+					rt->selected_object->sphere = plane_to_sphere (rt->selected_object->plane);
+					rt->selected_object->shape = SPHERE;
+				}
+			}
+			
 
-		for (int y = 0; y < rt->win.frame_height; y += 1)
-			for (int x = 0; x < rt->win.frame_width; x += 1)
-				set_pixel (&rt->win, x, y, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
+			t_vec3f	translation = ft_vec3f (
+					is_key_down (&rt->win, 'D') - is_key_down (&rt->win, 'A'),
+					is_key_down (&rt->win, 'E') - is_key_down (&rt->win, 'Q'),
+					is_key_down (&rt->win, 'W') - is_key_down (&rt->win, 'S')
+				);
+			translate_object (rt->selected_object, ft_mat4f_transform_vector (rt->camera.transform, translation));
+			
+			rotate_object (rt->selected_object, ft_vec3f (
+				is_key_down (&rt->win, 'L') - is_key_down (&rt->win, 'J'),
+				is_key_down (&rt->win, 'O') - is_key_down (&rt->win, 'U'),
+				is_key_down (&rt->win, 'I') - is_key_down (&rt->win, 'K')
+			));
+		}
+	}
+	else
+	{
+		if (is_key_pressed (&rt->win, KEY_SPACE))
+		{
+			rt->is_editing = TRUE;
+			rt->selected_object = NULL;
+		}
 
 		rt->camera.width = rt->win.frame_width;
 		rt->camera.height = rt->win.frame_height;
@@ -81,7 +224,6 @@ int	tick(t_rt *rt)
 		t_vec3f	up = ft_mat4f_up_vector (rt->camera.transform);
 		t_vec3f	forward = ft_mat4f_forward_vector (rt->camera.transform);
 
-		ft_fprintln (STDERR, "is_key_down key right: %d", rt->win.inputs[KEY_DOWN]);
 		rt->camera.yaw += (is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT)) * 2;
 		rt->camera.pitch += (is_key_down (&rt->win, KEY_UP) - is_key_down (&rt->win, KEY_DOWN)) * 2;
 		rt->camera.pitch = ft_clampf (rt->camera.pitch, -80, 80);
@@ -90,24 +232,12 @@ int	tick(t_rt *rt)
 		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (up, (is_key_down (&rt->win, 'E') - is_key_down (&rt->win, 'Q')) * speed));
 		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (forward, (is_key_down (&rt->win, 'W') - is_key_down (&rt->win, 'S')) * speed));
 
-		rt->camera.transform = ft_mat4f_rotate (ft_vec3f (1, 0, 0), rt->camera.pitch * PI / 180.0f);
-		rt->camera.transform = ft_mat4f_mul (ft_mat4f_rotate (ft_vec3f (0, 1, 0), rt->camera.yaw * PI / 180.0f), rt->camera.transform);
-		rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt->camera.position), rt->camera.transform);
+		rt->camera.transform = ft_mat4f_rotate_euler (ft_vec3f (rt->camera.yaw * PI / 180.0f, rt->camera.pitch * PI / 180.0f, 0));rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt->camera.position), rt->camera.transform);
 
 		rt->camera.aspect_ratio = rt->camera.width / rt->camera.height;
+	}
 
-		// rt->light_position = ft_vec3f (cosf (seconds * 0.6) * 10, -100 + sinf (seconds * 0.5) * 10, cosf (seconds * 0.2) * 10);
-		// planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 200);
-
-		for (int y = 0; y < rt->win.frame_height; y += 1)
-			for (int x = 0; x < rt->win.frame_width; x += 1)
-				render_pixel (rt, x, y);
-
-		update_window (&rt->win);
-
-		// ft_println ("%u", GetTickCount64 () - start);
-		// Sleep (10);
-	// }
+	render_frame (rt);
 	return (0);
 }
 
@@ -115,7 +245,6 @@ int	main(int ac, char **av)
 {
 	t_rt	rt;
 
-	(void)av;
 	if (ac < 2 || ac > 3)
 		return (1);
 	ft_memset (&rt, 0, sizeof (rt));
@@ -125,82 +254,7 @@ int	main(int ac, char **av)
 		ft_fprintln (STDERR, "Could not create window.");
 		return (1);
 	}
-
-	// float scale = tanf (60.0f * 0.5f * PI / 180.0f);
-	// rt.light_position = ft_vec3f (10, 10, 10);
-	// rt.light_color.rgb = ft_vec3f (1, 1, 1);
-	// rt.light_color.w = 0.7f;
-	// rt.ambient_light.rgb = ft_vec3f (0.7, 0.6, 0.4);
-	// rt.ambient_light.w = 0.2f;
-	// rt.camera.fov_in_degrees = 60.0f;
-	// rt.camera.transform = ft_mat4f_identity ();
-
-	add_sphere (&rt, ft_vec3f (0, 1, 20), 5.0)->color = ft_vec4f(1, 0, 0, 0);
-	add_sphere (&rt, ft_vec3f (1, -8, 15), 2.0)->color = ft_vec4f(0, 1, 0, 0);
-	add_sphere (&rt, ft_vec3f (-10, 20, 0), 7.0)->color = ft_vec4f(0, 0, 1, 0);
-	add_plane (&rt, ft_vec3f (0, 70, 0), ft_vec3f (0, 1, 0))->color = ft_vec4f(1, 0.2, 0.4, 0);
-
-	t_object	*planet = add_sphere (&rt, ft_vec3f (0, 0, 100), 60.0);
-	planet->color = ft_vec4f(1, 0, 1, 0);
-
-
-	t_object	*obj = add_object (&rt);
-	obj->shape = CYLINDER;
-	obj->cylinder.bottom = ft_vec3f (0, 0, 0);
-	obj->cylinder.top = ft_vec3f (0, 5, 0);
-	obj->cylinder.radius = 3;
-	obj->color = ft_vec4f (1, 0, 0, 0);
-
-	render(&tick, &rt);
-
-	// while (rt.win.opened)
-	// {
-	// 	// t_u64	start = GetTickCount64 ();
-	// 	// t_f32	seconds = ((t_f32)start) / 1000.0f;
-
-	// 	poll_window_events (&rt.win);
-
-	// 	for (int y = 0; y < rt.win.frame_height; y += 1)
-	// 		for (int x = 0; x < rt.win.frame_width; x += 1)
-	// 			set_pixel (&rt.win, x, y, ft_vec4f_mulf (rt.ambient_light, rt.ambient_light.w));
-
-	// 	rt.camera.width = rt.win.frame_width;
-	// 	rt.camera.height = rt.win.frame_height;
-	// 	rt.camera.scale = tanf (rt.camera.fov_in_degrees * 0.5f * PI / 180.0f);
-	// 	t_f32	speed = 1;
-	// 	if (is_key_down (&rt.win, KEY_SHIFT))
-	// 		speed = 10;
-
-	// 	t_vec3f	right = ft_mat4f_right_vector (rt.camera.transform);
-	// 	t_vec3f	up = ft_mat4f_up_vector (rt.camera.transform);
-	// 	t_vec3f	forward = ft_mat4f_forward_vector (rt.camera.transform);
-
-	// 	rt.camera.yaw += (is_key_down (&rt.win, KEY_RIGHT) - is_key_down (&rt.win, KEY_LEFT)) * 2;
-	// 	rt.camera.pitch += (is_key_down (&rt.win, KEY_UP) - is_key_down (&rt.win, KEY_DOWN)) * 2;
-	// 	rt.camera.pitch = ft_clampf (rt.camera.pitch, -80, 80);
-
-	// 	rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (right, (is_key_down (&rt.win, 'D') - is_key_down (&rt.win, 'A')) * speed));
-	// 	rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (up, (is_key_down (&rt.win, 'E') - is_key_down (&rt.win, 'Q')) * speed));
-	// 	rt.camera.position = ft_vec3f_add (rt.camera.position, ft_vec3f_mulf (forward, (is_key_down (&rt.win, 'W') - is_key_down (&rt.win, 'S')) * speed));
-
-	// 	rt.camera.transform = ft_mat4f_rotate (ft_vec3f (1, 0, 0), rt.camera.pitch * PI / 180.0f);
-	// 	rt.camera.transform = ft_mat4f_mul (ft_mat4f_rotate (ft_vec3f (0, 1, 0), rt.camera.yaw * PI / 180.0f), rt.camera.transform);
-	// 	rt.camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt.camera.position), rt.camera.transform);
-
-	// 	rt.camera.aspect_ratio = rt.camera.width / rt.camera.height;
-
-	// 	// rt.light_position = ft_vec3f (cosf (seconds * 0.6) * 10, -100 + sinf (seconds * 0.5) * 10, cosf (seconds * 0.2) * 10);
-	// 	// planet->sphere.center = ft_vec3f (cosf (seconds * 0.3) * 200, 0, sinf (seconds * 0.3) * 200);
-
-	// 	for (int y = 0; y < rt.win.frame_height; y += 1)
-	// 		for (int x = 0; x < rt.win.frame_width; x += 1)
-	// 			render_pixel (&rt, x, y);
-
-	// 	update_window (&rt.win);
-
-	// 	// ft_println ("%u", GetTickCount64 () - start);
-	// 	Sleep (10);
-	// }
+	main_loop (&rt.win, &tick, &rt);
 	destroy_window (&rt.win);
 	return (0);
 }
