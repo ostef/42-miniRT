@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 16:03:34 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/22 18:27:00 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/22 18:44:22 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,12 @@ int	mouse_move(int x, int y, void *win)
 
 t_bool	is_key_down(t_window *win, t_key key)
 {
-	return (win->inputs[code]);
+	return (win->inputs[key]);
+}
+
+t_bool	is_key_pressed(t_window *win, t_key key)
+{
+	return (win->inputs[key]);
 }
 
 t_vec2f	get_mouse_pos(t_window *win)
