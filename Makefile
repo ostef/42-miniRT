@@ -2,7 +2,7 @@ WINDOWS_NAME = miniRT.exe
 UNIX_NAME = miniRT
 
 SRC_DIR = source
-SRC_FILES = main.c objects.c intersection.c parsing.c raycast.c
+SRC_FILES = main.c objects.c intersection.c parsing/parsing.c parsing/parse_info.c parsing/parsing_utils.c raycast.c
 OBJ_DIR = obj
 INCLUDE_DIRS = libft ft_math .
 LIB_DIRS = libft ft_math
