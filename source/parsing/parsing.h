@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 14:03:52 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/22 16:57:59 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/23 15:22:23 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,23 +16,23 @@
 # include "miniRT.h"
 
 typedef enum e_error {
-	OK,
-	NO_FILENAME,
-	FILENAME,
-	FILE_CONTENT,
-	FORMAT,
-	IDENTIFIER,
-	RANGE_DIRECTION,
-	RANGE_COLOR,
-	RANGE_BRIGHTNESS,
-	RANGE_FOV,
-	FLOAT,
-	FORMAT_DIRECTION,
-	FORMAT_COORDINATE,
-	FORMAT_COLOR,
-	DOUBLE_CAMERA,
-	DOUBLE_LIGHT,
-	DOUBLE_AMBIENT_LIGHT
+	ERR_OK,
+	ERR_NO_FILENAME,
+	ERR_FILENAME,
+	ERR_FILE_CONTENT,
+	ERR_FORMAT,
+	ERR_IDENTIFIER,
+	ERR_RANGE_DIRECTION,
+	ERR_RANGE_COLOR,
+	ERR_RANGE_BRIGHTNESS,
+	ERR_RANGE_FOV,
+	ERR_FLOAT,
+	ERR_FORMAT_DIRECTION,
+	ERR_FORMAT_COORDINATE,
+	ERR_FORMAT_COLOR,
+	ERR_DOUBLE_CAMERA,
+	ERR_DOUBLE_LIGHT,
+	ERR_DOUBLE_AMBIENT_LIGHT
 }	t_error;
 
 // Parse info
