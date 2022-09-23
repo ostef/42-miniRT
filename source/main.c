@@ -54,6 +54,10 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 		color.b *= light.b;
 		set_pixel (&rt->win, px_x, px_y, color);
 	}
+	else
+	{
+		set_pixel (&rt->win, px_x, px_y, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
+	}
 }
 
 t_plane	sphere_to_plane(t_sphere sph)
@@ -115,31 +119,36 @@ t_cylinder	plane_to_cylinder(t_plane pla)
 int	tick(void *ptr)
 {
 	t_rt	*rt;
-	int		x;
-	int		y;
 
 	rt = (t_rt *)ptr;
-	y = 0;
-	while (y < rt->win.frame_height)
+
+	rt->camera.width = rt->win.frame_width;
+	rt->camera.height = rt->win.frame_height;
+	rt->camera.scale = tanf (rt->camera.fov_in_degrees * 0.5f * PI / 180.0f);
+	rt->camera.aspect_ratio = rt->camera.width / rt->camera.height;
+
+	if (is_key_pressed (&rt->win, KEY_SPACE))
 	{
-		x = 0;
-		while (x < rt->win.frame_width)
-		{
-			set_pixel (&rt->win, x, y, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
-			x += 1;
-		}
-		y += 1;
+		rt->is_editing = !rt->is_editing;
+		rt->selected_object = NULL;
 	}
 
 	if (rt->is_editing)
 	{
-		if (is_key_pressed (&rt->win, KEY_SPACE))
-		{
-			rt->is_editing = FALSE;
-			rt->selected_object = NULL;
-		}
 		if (rt->obj_count > 0)
 		{
+			if (is_key_pressed (&rt->win, MOUSE_LEFT))
+			{
+				t_ray	ray;
+				t_vec2f	mouse = get_mouse_pos (&rt->win);
+				ray.origin = rt->camera.position;
+				ray.dir = ft_vec3f (
+					2 * rt->camera.scale * (mouse.x / (t_f32)rt->camera.width - 0.5f) * rt->camera.aspect_ratio,
+					2 * rt->camera.scale * (mouse.y / (t_f32)rt->camera.height - 0.5f),
+					1);
+				ray.dir = ft_mat4f_transform_vector(rt->camera.transform, ft_vec3f_normalized (ray.dir));
+				rt->selected_object = raycast_closest (rt, ray).object;
+			}
 			if (is_key_pressed (&rt->win, KEY_RIGHT) || is_key_pressed (&rt->win, KEY_UP))
 			{
 				if (!rt->selected_object)
@@ -163,16 +172,16 @@ int	tick(void *ptr)
 		{
 			rt->selected_object = add_sphere (rt, ft_vec3f(0,0,0), 1);
 		}
-		if (is_key_pressed (&rt->win, KEY_MINUS) && rt->selected_object)
-		{
-			remove_object (rt, rt->selected_object - rt->objs);
-			if (rt->selected_object >= rt->objs + rt->obj_count)
-				rt->selected_object -= 1;;
-			if (rt->selected_object < rt->objs)
-				rt->selected_object = NULL;
-		}
 		if (rt->selected_object)
 		{
+			if (is_key_pressed (&rt->win, KEY_MINUS))
+			{
+				remove_object (rt, rt->selected_object - rt->objs);
+				if (rt->selected_object >= rt->objs + rt->obj_count)
+					rt->selected_object -= 1;;
+				if (rt->selected_object < rt->objs)
+					rt->selected_object = NULL;
+			}
 			if (is_key_pressed (&rt->win, 'P'))
 			{
 				if (rt->selected_object->shape == SPHERE)
@@ -191,7 +200,6 @@ int	tick(void *ptr)
 					rt->selected_object->shape = SPHERE;
 				}
 			}
-			
 
 			t_vec3f	translation = ft_vec3f (
 					is_key_down (&rt->win, 'D') - is_key_down (&rt->win, 'A'),
@@ -209,15 +217,6 @@ int	tick(void *ptr)
 	}
 	else
 	{
-		if (is_key_pressed (&rt->win, KEY_SPACE))
-		{
-			rt->is_editing = TRUE;
-			rt->selected_object = NULL;
-		}
-
-		rt->camera.width = rt->win.frame_width;
-		rt->camera.height = rt->win.frame_height;
-		rt->camera.scale = tanf (rt->camera.fov_in_degrees * 0.5f * PI / 180.0f);
 		t_f32	speed = 1;
 		if (is_key_down (&rt->win, KEY_SHIFT))
 			speed = 10;
@@ -233,10 +232,9 @@ int	tick(void *ptr)
 		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (right, (is_key_down (&rt->win, 'D') - is_key_down (&rt->win, 'A')) * speed));
 		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (up, (is_key_down (&rt->win, 'E') - is_key_down (&rt->win, 'Q')) * speed));
 		rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (forward, (is_key_down (&rt->win, 'W') - is_key_down (&rt->win, 'S')) * speed));
-
-		rt->camera.transform = ft_mat4f_rotate_euler (ft_vec3f (rt->camera.yaw * PI / 180.0f, rt->camera.pitch * PI / 180.0f, 0));rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt->camera.position), rt->camera.transform);
-
-		rt->camera.aspect_ratio = rt->camera.width / rt->camera.height;
+	
+		rt->camera.transform = ft_mat4f_rotate_euler (ft_vec3f (rt->camera.yaw * PI / 180.0f, rt->camera.pitch * PI / 180.0f, 0));
+		rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt->camera.position), rt->camera.transform);
 	}
 
 	render_frame (rt);
