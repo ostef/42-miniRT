@@ -23,14 +23,25 @@
 #  include "minilibx_layer.h"
 # endif
 
+enum
+{
+	KS_UP = 0,
+	KS_PRESSED = 1,
+	KS_DOWN = 2,
+	KS_RELEASED = 3
+};
+
 t_bool		create_window(t_window *win, t_cstr title, int width, int height);
 void		destroy_window(t_window *win);
 void		main_loop(t_window *win, int (*f)(void *), void *data);
 void		set_pixel(t_window *win, int x, int y, t_vec4f color);
 t_vec4f		get_pixel(t_window *win, int x, int y);
 
+t_thread	create_thread(int (*f)(void *), void *data);
+void		destroy_thread(t_thread t);
+void		wait_for_all_threads(t_thread *t, t_s64 n);
+
 t_vec2f		get_mouse_pos(t_window *win);
-t_bool		was_key_down(t_window *win, t_key key);
 t_bool		is_key_down(t_window *win, t_key key);
 t_bool		is_key_pressed(t_window *win, t_key key);
 t_bool		is_key_released(t_window *win, t_key key);

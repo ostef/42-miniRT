@@ -21,23 +21,18 @@ t_vec2f	get_mouse_pos(t_window *win)
 	return (ft_vec2f ((t_f32)pos.x, (t_f32)pos.y));
 }
 
-t_bool	was_key_down(t_window *win, t_key key)
-{
-	return (win->prev_key_states[key]);
-}
-
 t_bool	is_key_down(t_window *win, t_key key)
 {
-	(void)win;
-	return (GetAsyncKeyState (key) & 0x8000) != 0;
+	return (win->key_states[key] == KS_DOWN
+			|| win->key_states[key] == KS_PRESSED);
 }
 
 t_bool	is_key_pressed(t_window *win, t_key key)
 {
-	return (!was_key_down (win, key) && is_key_down (win, key));
+	return (win->key_states[key] == KS_PRESSED);
 }
 
 t_bool	is_key_released(t_window *win, t_key key)
 {
-	return (was_key_down (win, key) && !is_key_down (win, key));
+	return (win->key_states[key] == KS_RELEASED);
 }
