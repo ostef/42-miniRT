@@ -115,4 +115,8 @@ typedef enum e_key
 
 typedef HANDLE	t_thread;
 
+t_thread	create_thread(int (*f)(void *), void *data);
+void		destroy_thread(t_thread t);
+void		wait_for_all_threads(t_thread *t, t_s64 n);
+
 #endif

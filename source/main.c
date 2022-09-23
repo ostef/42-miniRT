@@ -112,11 +112,13 @@ t_cylinder	plane_to_cylinder(t_plane pla)
 	return (res);
 }
 
-int	tick(t_rt *rt)
+int	tick(void *ptr)
 {
-	int	x;
-	int	y;
+	t_rt	*rt;
+	int		x;
+	int		y;
 
+	rt = (t_rt *)ptr;
 	y = 0;
 	while (y < rt->win.frame_height)
 	{

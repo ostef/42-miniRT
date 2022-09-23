@@ -6,11 +6,21 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 16:03:34 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/14 17:42:48 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/22 18:44:22 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minilibx_layer.h"
+
+int	destroy(int keycode, void *win)
+{
+	if (ft_get_heap_allocations () != 0)
+		ft_fprintln (STDERR, "Found %i leaks.", ft_get_heap_allocations ());
+	exit(0);
+	(void)keycode;
+	(void)win;
+	return (0);
+}
 
 int	keydown(int keycode, void *win)
 {
@@ -18,9 +28,7 @@ int	keydown(int keycode, void *win)
 
 	window = (t_window *)win;
 	if (keycode == KEY_ESCAPE)
-	{
-		exit(0);
-	}
+		destroy(keycode, win);
 	window->inputs[keycode] = TRUE;
 	return (0);
 }
@@ -66,9 +74,14 @@ int	mouse_move(int x, int y, void *win)
 	return (0);
 }
 
-t_bool	is_key_down(t_window *win, int code)
+t_bool	is_key_down(t_window *win, t_key key)
 {
-	return (win->inputs[code]);
+	return (win->inputs[key]);
+}
+
+t_bool	is_key_pressed(t_window *win, t_key key)
+{
+	return (win->inputs[key]);
 }
 
 t_vec2f	get_mouse_pos(t_window *win)
@@ -76,18 +89,6 @@ t_vec2f	get_mouse_pos(t_window *win)
 	return (ft_vec2f(win->mouse_coords.x, win->mouse_coords.y));
 }
 
-int	destroy(int keycode, void *win)
-{
-	t_window	*window;
-
-	window = (t_window *)win;
-	window->opened = FALSE;
-	if (ft_get_heap_allocations () != 0)
-		ft_fprintln (STDERR, "Found %i leaks.", ft_get_heap_allocations ());
-	exit(0);
-	(void)keycode;
-	return (0);
-}
 
 void	init_events(t_window *win)
 {

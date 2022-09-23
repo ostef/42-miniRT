@@ -6,18 +6,18 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 14:31:26 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/16 14:34:12 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/22 18:41:54 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minilibx_layer.h"
+#include "miniRT.h"
 
-t_bool	create_window(t_window *win, t_str title, int width, int height)
+t_bool	create_window(t_window *win, t_cstr title, int width, int height)
 {
 	win->mlx = mlx_init();
 	if (!win->mlx)
 		return (FALSE);
-	win->window = mlx_new_window(win->mlx, width, height, title);
+	win->window = mlx_new_window(win->mlx, width, height, (t_str)title);
 	if (!win->window)
 		return (FALSE);
 	win->image.ptr = mlx_new_image(win->mlx, width, height);
@@ -61,9 +61,4 @@ void	set_pixel(t_window *win, int x, int y, t_vec4f color)
 	dst = win->pixels + (y * win->image.size_line + x * (win->image.bits_per_pixel / 8));
 	*dst = (((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
 			| ((t_u8)(color.z * 255));
-}
-
-void	poll_window_events(t_window *win)
-{
-	(void) win;
 }
