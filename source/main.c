@@ -149,24 +149,6 @@ int	tick(void *ptr)
 				ray.dir = ft_mat4f_transform_vector(rt->camera.transform, ft_vec3f_normalized (ray.dir));
 				rt->selected_object = raycast_closest (rt, ray).object;
 			}
-			if (is_key_pressed (&rt->win, KEY_RIGHT) || is_key_pressed (&rt->win, KEY_UP))
-			{
-				if (!rt->selected_object)
-					rt->selected_object = rt->objs;
-				else if (rt->selected_object == rt->objs + rt->obj_count - 1)
-					rt->selected_object = NULL;
-				else
-					rt->selected_object += 1;
-			}
-			if (is_key_pressed (&rt->win, KEY_LEFT) || is_key_pressed (&rt->win, KEY_DOWN))
-			{
-				if (!rt->selected_object)
-					rt->selected_object = rt->objs + rt->obj_count - 1;
-				else if (rt->selected_object == rt->objs)
-					rt->selected_object = NULL;
-				else
-					rt->selected_object -= 1;
-			}
 		}
 		if (is_key_pressed (&rt->win, KEY_PLUS))
 		{
@@ -213,6 +195,26 @@ int	tick(void *ptr)
 				is_key_down (&rt->win, 'O') - is_key_down (&rt->win, 'U'),
 				is_key_down (&rt->win, 'I') - is_key_down (&rt->win, 'K')
 			));
+
+			if (rt->selected_object->shape == SPHERE)
+			{
+				rt->selected_object->sphere.radius += (is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT));
+				rt->selected_object->sphere.radius += (is_key_down (&rt->win, KEY_UP) - is_key_down (&rt->win, KEY_DOWN));
+				rt->selected_object->sphere.radius = ft_maxf (rt->selected_object->sphere.radius, 0.1f);
+			}
+			else if (rt->selected_object->shape == CYLINDER)
+			{
+				t_f32	cylinder_height = ft_vec3f_dist (rt->selected_object->cylinder.bottom, rt->selected_object->cylinder.top);
+				t_vec3f	cylinder_up = ft_vec3f_normalized (ft_vec3f_sub (rt->selected_object->cylinder.top, rt->selected_object->cylinder.bottom));
+				t_vec3f	cylinder_center = ft_vec3f_mulf (ft_vec3f_add (rt->selected_object->cylinder.top, rt->selected_object->cylinder.bottom), 0.5f);
+
+				cylinder_height += is_key_down (&rt->win, KEY_UP) - is_key_down (&rt->win, KEY_DOWN);
+				cylinder_height = ft_maxf (cylinder_height, 0.1f);
+				rt->selected_object->cylinder.bottom = ft_vec3f_add (cylinder_center, ft_vec3f_mulf (cylinder_up, -cylinder_height * 0.5f));
+				rt->selected_object->cylinder.top = ft_vec3f_add (cylinder_center, ft_vec3f_mulf (cylinder_up, cylinder_height * 0.5f));
+				rt->selected_object->cylinder.radius += (is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT));
+				rt->selected_object->cylinder.radius = ft_maxf (rt->selected_object->cylinder.radius, 0.1f);
+			}
 		}
 	}
 	else
