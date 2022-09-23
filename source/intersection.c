@@ -53,11 +53,6 @@ t_bool	ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_res *res)
 
 t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_res *res)
 {
-	// t_hit_res	tmp_hit;
-	// t_plane			pla;
-
-	t_vec3f	pa;
-	t_vec3f	pb;
 	t_vec3f	ba;
 	t_vec3f	oc;
 	t_f32	baba;
@@ -67,10 +62,8 @@ t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_res *res)
 	t_f32	k1;
 	t_f32	k2;
 
-	pa = cyl.top; //ft_vec3f_add (cyl.center, ft_vec3f_mulf (cyl.up, cyl.height * 0.5));
-	pb = cyl.bottom; //ft_vec3f_sub (cyl.center, ft_vec3f_mulf (cyl.up, cyl.height * 0.5));
-	ba = ft_vec3f_sub (pb, pa);
-	oc = ft_vec3f_sub (ray.origin, pa);
+	ba = ft_vec3f_sub (cyl.top, cyl.bottom);
+	oc = ft_vec3f_sub (ray.origin, cyl.bottom);
 	baba = ft_vec3f_dot (ba, ba);
 	bard = ft_vec3f_dot (ba, ray.dir);
 	baoc = ft_vec3f_dot (ba, oc);
@@ -86,16 +79,10 @@ t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_res *res)
 	}
 	h = sqrtf (h);
 	float t = (-k1 - h) / k2;
-	if (t < 0)
-	{
-		if (res)
-			res->hit = FALSE;
-		return (FALSE);
-	}
 
 	// body
 	float y = baoc + t * bard;
-	if (y > 0 && y < baba)
+	if (t >= 0 && y > 0 && y < baba)
 	{
 		if (res)
 		{
@@ -112,12 +99,15 @@ t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_res *res)
 	else
 		t = baba;
 	t = (t - baoc) / bard;
-	if (ft_absf (k1 + k2 * t) < h)
+	if (t >= 0 && ft_absf (k1 + k2 * t) < h)
 	{
 		if (res)
 		{
 			res->dist = t;
-			res->normal = ft_vec3f_mulf (ba, ft_signf (y) / baba);
+			if (y < 0)
+				res->normal = ft_vec3f_normalized (ft_vec3f_sub (cyl.bottom, cyl.top));
+			else
+				res->normal = ft_vec3f_normalized (ft_vec3f_sub (cyl.top, cyl.bottom));
 			res->point = ft_vec3f_add (ray.origin, ft_vec3f_mulf (ray.dir, t));
 			res->hit = TRUE;
 		}
