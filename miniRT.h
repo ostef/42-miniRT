@@ -127,6 +127,9 @@ void		translate_object(t_object *obj, t_vec3f amount);
 void		rotate_object(t_object *obj, t_vec3f amount);
 
 t_rt		parsing(t_str filename);
+
+void		clear_frame(t_rt *rt, t_vec4f color);
+void		render_pixel(t_rt *rt, t_int px_x, t_int px_y);
 void		render_frame(t_rt *rt);
 
 typedef struct s_hit_res

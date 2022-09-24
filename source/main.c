@@ -12,54 +12,6 @@
 
 #include "miniRT.h"
 
-void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
-{
-	t_ray		ray;
-	t_hit_res	hit;
-	t_hit_res	shadow_hit;
-	t_f32		diffuse_intensity;
-
-	ray.origin = rt->camera.position;
-	ray.dir = ft_vec3f (
-		(2 * (px_x + 0.5f) / rt->camera.width - 1) * rt->camera.aspect_ratio * rt->camera.scale,
-		(1 - 2 * (px_y + 0.5f) / rt->camera.height) * rt->camera.scale, 1);
-	ray.dir = ft_mat4f_transform_vector(rt->camera.transform, ft_vec3f_normalized (ray.dir));
-	hit = raycast_closest (rt, ray);
-	if (hit.object)
-	{
-		t_vec4f	color;
-		if (rt->selected_object == hit.object)
-		{
-			diffuse_intensity = 1;
-			color = ft_vec4f (1, 1, 1, 1);
-		}
-		else
-		{
-			t_vec3f	point_to_light = ft_vec3f_normalized (ft_vec3f_sub (rt->light_position, hit.point));
-			ray.origin = hit.point;
-			ray.dir = point_to_light;
-			shadow_hit = raycast_closest_except (rt, ray, hit.object);
-			if (shadow_hit.hit && shadow_hit.dist < ft_vec3f_dist (rt->light_position, ray.origin))
-				diffuse_intensity = 0;
-			else
-				diffuse_intensity = ft_maxf (ft_vec3f_dot (hit.normal, point_to_light), 0);
-			color = hit.object->color;
-		}
-
-		t_vec4f	diffuse = ft_vec4f_mulf (rt->light_color, rt->light_color.w * diffuse_intensity);
-		t_vec4f	ambient = ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w);
-		t_vec4f	light = ft_vec4f_add (diffuse, ambient);
-		color.r *= light.r;
-		color.g *= light.g;
-		color.b *= light.b;
-		set_pixel (&rt->win, px_x, px_y, color);
-	}
-	else
-	{
-		set_pixel (&rt->win, px_x, px_y, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
-	}
-}
-
 t_plane	sphere_to_plane(t_sphere sph)
 {
 	t_plane	res;
@@ -239,6 +191,7 @@ int	tick(void *ptr)
 		rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt->camera.position), rt->camera.transform);
 	}
 
+	clear_frame (rt, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
 	render_frame (rt);
 	return (0);
 }
