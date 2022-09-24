@@ -14,6 +14,7 @@
 
 t_object	*add_object(t_rt *rt)
 {
+	t_object	*obj;
 	if (rt->obj_count == rt->obj_cap)
 	{
 		rt->objs = ft_realloc (rt->objs, rt->obj_cap * sizeof(t_object),
@@ -21,7 +22,9 @@ t_object	*add_object(t_rt *rt)
 		rt->obj_cap = rt->obj_cap * 2 + 8;
 	}
 	rt->obj_count += 1;
-	return (&rt->objs[rt->obj_count - 1]);
+	obj = &rt->objs[rt->obj_count - 1];
+	obj->color = ft_vec4f (1, 1, 1, 1);
+	return (obj);
 }
 
 t_object	*add_sphere(t_rt *rt, t_vec3f center, t_f32 radius)
