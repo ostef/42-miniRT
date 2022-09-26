@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 15:33:55 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/23 15:22:23 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 15:45:25 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,10 +104,8 @@ t_error	parse_camera(t_pcstr *line_split, t_camera *camera)
 	code = parse_direction_f(ft_dup_split_str(line_split[2]), &direction);
 	if (code != ERR_OK)
 		return (code);
-	(void)direction;
-	// camera->yaw = atan2f(direction.y, direction.x);
-	// t_f32 distance = sqrt(direction.z * direction.z + direction.x * direction.x);
-	// camera->pitch = asinf(direction.y / distance);
+	camera->yaw = atan2f(direction.y, direction.x) * 180 / PI;
+	camera->pitch = asinf(-direction.y) * 180 / PI;
 	code = parse_float_f(ft_dup_split_str(line_split[3]), &camera->fov_in_degrees);
 	if (code != ERR_OK)
 		return (code);
