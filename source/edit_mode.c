@@ -45,7 +45,8 @@ void	change_object_type(t_object *obj)
 
 void	edit_mode_update(t_rt *rt)
 {
-	t_ray	ray;
+	t_ray		ray;
+	t_object	*new_obj;
 
 	if (rt->obj_count > 0)
 	{
@@ -56,7 +57,16 @@ void	edit_mode_update(t_rt *rt)
 		}
 	}
 	if (is_key_pressed (&rt->win, KEY_PLUS))
-		rt->selected_object = add_sphere (rt, ft_vec3f(0,0,0), 1);
+	{
+		if (rt->selected_object)
+		{
+			new_obj = add_object (rt);
+			*new_obj = *rt->selected_object;
+			rt->selected_object = new_obj;
+		}
+		else
+			rt->selected_object = add_sphere (rt, ft_vec3f(0,0,0), 1);
+	}
 	if (rt->selected_object)
 	{
 		if (is_key_pressed (&rt->win, KEY_MINUS))
