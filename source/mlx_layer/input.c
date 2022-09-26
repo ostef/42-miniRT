@@ -6,11 +6,11 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 16:03:34 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 14:43:03 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 14:51:09 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minilibx_layer.h"
+#include "miniRT.h"
 
 int	on_destroy(int keycode, void *win)
 {
@@ -28,7 +28,7 @@ int	on_keydown(int keycode, void *win)
 
 	window = (t_window *)win;
 	if (keycode == KEY_ESCAPE)
-		destroy(keycode, win);
+		on_destroy(keycode, win);
 	window->inputs[keycode] = TRUE;
 	return (0);
 }
@@ -97,10 +97,10 @@ t_bool	is_key_released(t_window *win, t_key key)
 
 void	init_events(t_window *win)
 {
-	mlx_hook(win->window, MOUSE_PRESS, 0, on_mouse_press, win);
-	mlx_hook(win->window, MOUSE_RELEASE, 0, on_mouse_release, win);
-	mlx_hook(win->window, MOUSE_MOVE, 0, on_mouse_move, win);
-	mlx_hook(win->window, KEY_PRESS, 0, on_keydown, win);
-	mlx_hook(win->window, KEY_RELEASE, 0, on_keyup, win);
-	mlx_hook(win->window, DESTROY_NOTIFY, 0, on_destroy, win);
+	mlx_hook(win->mlx_win, MOUSE_PRESS, 0, on_mouse_press, win);
+	mlx_hook(win->mlx_win, MOUSE_RELEASE, 0, on_mouse_release, win);
+	mlx_hook(win->mlx_win, MOUSE_MOVE, 0, on_mouse_move, win);
+	mlx_hook(win->mlx_win, KEY_PRESS, 0, on_keydown, win);
+	mlx_hook(win->mlx_win, KEY_RELEASE, 0, on_keyup, win);
+	mlx_hook(win->mlx_win, DESTROY_NOTIFY, 0, on_destroy, win);
 }

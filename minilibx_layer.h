@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minilibx_layer.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 13:49:37 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 14:35:43 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 14:50:22 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,8 +148,6 @@ typedef struct s_window
 	t_vec2f	mouse_coords;
 	t_bool	opened;
 }	t_window;
-
-typedef void	*t_thread;
 
 void	init_events(t_window *win);
 
