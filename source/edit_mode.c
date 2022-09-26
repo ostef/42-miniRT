@@ -86,8 +86,8 @@ void	edit_mode_update(t_rt *rt)
 			);
 		translate_object (rt->selected_object, ft_mat4f_transform_vector (rt->camera.transform, translation));
 		rotate_object (rt->selected_object, ft_vec3f (
-			is_key_down (&rt->win, KEY_L) - is_key_down (&rt->win, KEY_J),
 			is_key_down (&rt->win, KEY_O) - is_key_down (&rt->win, KEY_U),
+			is_key_down (&rt->win, KEY_L) - is_key_down (&rt->win, KEY_J),
 			is_key_down (&rt->win, KEY_I) - is_key_down (&rt->win, KEY_K)
 		));
 		scale_object (rt->selected_object, ft_vec2f (

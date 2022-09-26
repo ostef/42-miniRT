@@ -27,19 +27,33 @@ void	translate_object(t_object *obj, t_vec3f amount)
 		obj->light.pos = ft_vec3f_add (obj->light.pos, amount);
 }
 
+static t_mat3f	get_rotation_matrix(t_object *obj)
+{
+	t_vec3f	right;
+	t_vec3f	forward;
+	t_vec3f	up;
+
+	if (obj->type == CYLINDER)
+		up = ft_vec3f_normalized (
+				ft_vec3f_sub (obj->cylinder.top, obj->cylinder.bottom));
+	else if (obj->type == PLANE)
+		up = obj->plane.normal;
+	ft_vec3f_up_to_orthonormal (up, &right, &forward);
+	return (ft_mat3f_from_basis (right, up, forward));
+}
+
 void	rotate_object(t_object *obj, t_vec3f amount)
 {
-	t_mat4f	mat;
+	t_mat3f	mat;
 	t_vec3f	cyl_u;
 	t_vec3f	cyl_c;
 	t_f32	cyl_h;
 
-	mat = ft_mat4f_rotate_euler (ft_vec3f_mulf (amount, PI / 180.0f));
+	mat = get_rotation_matrix (obj);
+	mat = ft_mat3f_mul (mat, ft_mat3f_rotate_euler (ft_vec3f_mulf (amount, PI / 180.0f)));
 	if (obj->type == CYLINDER)
 	{
-		cyl_u = ft_vec3f_normalized (
-				ft_vec3f_sub (obj->cylinder.top, obj->cylinder.bottom));
-		cyl_u = ft_mat4f_transform_vector (mat, cyl_u);
+		cyl_u = ft_mat3f_up_vector (mat);
 		cyl_c = ft_vec3f_mulf (
 				ft_vec3f_add (obj->cylinder.bottom, obj->cylinder.top), 0.5f);
 		cyl_h = ft_vec3f_dist (obj->cylinder.bottom, obj->cylinder.top);
@@ -49,9 +63,7 @@ void	rotate_object(t_object *obj, t_vec3f amount)
 				ft_vec3f_mulf (cyl_u, cyl_h * 0.5f));
 	}
 	else if (obj->type == PLANE)
-	{
-		obj->plane.normal = ft_mat4f_transform_vector (mat, obj->plane.normal);
-	}
+		obj->plane.normal = ft_mat3f_up_vector (mat);
 }
 
 void	scale_object(t_object *obj, t_vec2f amount)
