@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 13:49:37 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 15:37:38 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 16:07:32 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,13 @@
 # include "ft_math.h"
 # include <pthread.h>
 
-typedef struct s_thread {
+typedef struct s_thread
+{
 	int 		(*routine)(void *);
 	void		*data;
 	pthread_t	thread;
 }	t_thread;
+
 typedef enum e_x11event
 {
 	KEY_PRESS = 2,
@@ -62,6 +64,7 @@ typedef enum e_x11event
 	LAST_EVENT = 36,
 }	t_x11event;
 
+/* @Todo (stefan): ensure we have all the same keys as in the Win32 layer */
 typedef enum e_key
 {
 	KEY_A = 0,
@@ -119,7 +122,9 @@ typedef enum e_key
 	KEY_F2 = 120,
 	KEY_CTRL = 256,
 	KEY_SHIFT = 257,
-	MOUSE_LEFT = 501
+	MOUSE_LEFT = 501,
+	MOUSE_RIGHT = 502,
+	MOUSE_MIDDLE = 503
 }	t_key;
 
 typedef struct s_image
@@ -144,6 +149,7 @@ typedef struct s_window
 	t_s64	frame_height;
 	void	*pixels;
 	t_bool	prev_inputs[512];
+	t_bool	curr_inputs[512];
 	t_bool	inputs[512];
 	t_vec2f	mouse_coords;
 	t_bool	opened;

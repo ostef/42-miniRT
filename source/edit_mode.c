@@ -76,7 +76,8 @@ void	edit_mode_update(t_rt *rt)
 		if (is_key_pressed (&rt->win, MOUSE_LEFT))
 		{
 			t_ray	ray;
-		
+
+			ft_println ("Mouse left pressed");
 			ray = ray_from_screen_point (rt, get_mouse_pos (&rt->win), FALSE);
 			rt->selected_object = raycast_closest (rt, ray).object;
 		}
@@ -93,7 +94,7 @@ void	edit_mode_update(t_rt *rt)
 			if (rt->selected_object < rt->objs)
 				rt->selected_object = NULL;
 		}
-		if (is_key_pressed (&rt->win, 'P'))
+		if (is_key_pressed (&rt->win, KEY_P))
 		{
 			if (rt->selected_object->shape == SPHERE)
 			{
@@ -112,15 +113,15 @@ void	edit_mode_update(t_rt *rt)
 			}
 		}
 		t_vec3f	translation = ft_vec3f (
-				is_key_down (&rt->win, 'D') - is_key_down (&rt->win, 'A'),
-				is_key_down (&rt->win, 'E') - is_key_down (&rt->win, 'Q'),
-				is_key_down (&rt->win, 'W') - is_key_down (&rt->win, 'S')
+				is_key_down (&rt->win, KEY_D) - is_key_down (&rt->win, KEY_A),
+				is_key_down (&rt->win, KEY_E) - is_key_down (&rt->win, KEY_Q),
+				is_key_down (&rt->win, KEY_W) - is_key_down (&rt->win, KEY_S)
 			);
 		translate_object (rt->selected_object, ft_mat4f_transform_vector (rt->camera.transform, translation));
 		rotate_object (rt->selected_object, ft_vec3f (
-			is_key_down (&rt->win, 'L') - is_key_down (&rt->win, 'J'),
-			is_key_down (&rt->win, 'O') - is_key_down (&rt->win, 'U'),
-			is_key_down (&rt->win, 'I') - is_key_down (&rt->win, 'K')
+			is_key_down (&rt->win, KEY_L) - is_key_down (&rt->win, KEY_J),
+			is_key_down (&rt->win, KEY_O) - is_key_down (&rt->win, KEY_U),
+			is_key_down (&rt->win, KEY_I) - is_key_down (&rt->win, KEY_K)
 		));
 		scale_object (rt->selected_object, ft_vec2f (
 			is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT),
