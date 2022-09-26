@@ -17,7 +17,7 @@ SRC_FILES += win32_layer/window.c win32_layer/input.c win32_layer/loop.c win32_l
 
 else
 
-SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/render.c mlx_layer/threads.c
+SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/loop.c mlx_layer/threads.c
 endif
 
 BONUS_SRC_FILES := $(SRC_FILES) render/render_frame_mt.c

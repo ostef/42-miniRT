@@ -40,7 +40,7 @@ t_vec4f		get_pixel(t_window *win, int x, int y);
 
 int			create_thread(t_thread *thread, int (*f)(void *), void *data);
 void		destroy_thread(t_thread t);
-void		wait_for_all_threads(t_thread *t, t_s64 n);
+void		wait_for_threads(t_thread *t, t_s64 n);
 
 t_vec2f		get_mouse_pos(t_window *win);
 t_bool		is_key_down(t_window *win, t_key key);
