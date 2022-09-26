@@ -53,7 +53,7 @@ static t_vec4f	calc_diffuse(t_rt *rt, t_hit_res hit)
 		point_to_light = ft_vec3f_normalized (ft_vec3f_sub (obj.light.pos, hit.point));
 		shadow_ray.origin = hit.point;
 		shadow_ray.dir = point_to_light;
-		shadow_hit = raycast_closest_except (rt, shadow_ray, hit.object);
+		shadow_hit = raycast_closest_except (rt, shadow_ray, hit.object, FIL_SHAPES);
 		if (shadow_hit.hit && shadow_hit.dist * shadow_hit.dist < ft_vec3f_sqrd_dist (obj.light.pos, shadow_ray.origin))
 			diffuse.w = 0;
 		else
@@ -71,13 +71,16 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	t_px_data	dat;
 
 	ray = ray_from_screen_point (rt, ft_vec2f (px_x + 0.5f, px_y + 0.5f), INVERT_Y);
-	dat.hit = raycast_closest (rt, ray);
+	if (rt->is_editing)
+		dat.hit = raycast_closest (rt, ray, FIL_ALL);
+	else
+		dat.hit = raycast_closest (rt, ray, FIL_SHAPES);
 	if (dat.hit.object)
 	{
 		if (rt->selected_object == dat.hit.object)
-		{
 			set_pixel (&rt->win, px_x, px_y, ft_vec4f (1, 1, 1, 1));
-		}
+		else if (dat.hit.object->type == LIGHT)
+			set_pixel (&rt->win, px_x, px_y, dat.hit.object->color);
 		else
 		{
 			dat.color = dat.hit.object->color;

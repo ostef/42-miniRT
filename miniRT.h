@@ -145,6 +145,17 @@ void		clear_frame(t_rt *rt, t_vec4f color);
 void		render_pixel(t_rt *rt, t_int px_x, t_int px_y);
 void		render_frame(t_rt *rt);
 
+typedef enum e_filter
+{
+	FIL_NONE = 0x00,
+	FIL_SPHERES = 1 << SPHERE,
+	FIL_CYLINDERS = 1 << CYLINDER,
+	FIL_PLANES = 1 << PLANE,
+	FIL_SHAPES = FIL_SPHERES | FIL_CYLINDERS | FIL_PLANES,
+	FIL_LIGHTS = 1 << LIGHT,
+	FIL_ALL = 0xffffffff
+}	t_filter;
+
 typedef struct s_hit_res
 {
 	t_vec3f		normal;
@@ -160,10 +171,10 @@ t_bool		ray_cylinder_intersection(t_ray ray, t_cylinder cyl,
 t_bool		ray_plane_intersection(t_ray ray, t_plane pla, t_hit_res *res);
 t_bool		ray_object_intersection(t_ray ray, t_object *obj, t_hit_res *res);
 
-t_hit_res	raycast_first(t_rt *rt, t_ray ray);
-t_hit_res	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore);
-t_hit_res	raycast_closest(t_rt *rt, t_ray ray);
-t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore);
+t_hit_res	raycast_first(t_rt *rt, t_ray ray, t_filter fil);
+t_hit_res	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore, t_filter fil);
+t_hit_res	raycast_closest(t_rt *rt, t_ray ray, t_filter fil);
+t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore, t_filter fil);
 void		render_pixel(t_rt *rt, t_int px_x, t_int px_y);
 
 #endif

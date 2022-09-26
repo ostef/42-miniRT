@@ -23,6 +23,8 @@ void	translate_object(t_object *obj, t_vec3f amount)
 	}
 	else if (obj->type == PLANE)
 		obj->plane.origin = ft_vec3f_add (obj->plane.origin, amount);
+	else if (obj->type == LIGHT)
+		obj->light.pos = ft_vec3f_add (obj->light.pos, amount);
 }
 
 void	rotate_object(t_object *obj, t_vec3f amount)
