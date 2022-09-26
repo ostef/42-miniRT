@@ -29,11 +29,7 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 	t_ray		ray;
 	t_px_data	dat;
 
-	ray.origin = rt->camera.position;
-	ray.dir = ft_vec3f (
-		(2 * (px_x + 0.5f) / rt->camera.width - 1) * rt->camera.aspect_ratio * rt->camera.scale,
-		(1 - 2 * (px_y + 0.5f) / rt->camera.height) * rt->camera.scale, 1);
-	ray.dir = ft_mat4f_transform_vector(rt->camera.transform, ft_vec3f_normalized (ray.dir));
+	ray = ray_from_screen_point (rt, ft_vec2f (px_x + 0.5f, px_y + 0.5f), TRUE);
 	dat.hit = raycast_closest (rt, ray);
 	if (dat.hit.object)
 	{

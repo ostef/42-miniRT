@@ -124,10 +124,16 @@ t_object	*add_sphere(t_rt *rt, t_vec3f center, t_f32 radius);
 t_object	*add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius);
 t_object	*add_plane(t_rt *rt, t_vec3f origin, t_vec3f normal);
 void		remove_object(t_rt *rt, t_s64 index);
+
 void		translate_object(t_object *obj, t_vec3f amount);
 void		rotate_object(t_object *obj, t_vec3f amount);
+void		scale_object(t_object *obj, t_vec2f amount);
 
 t_rt		parsing(t_str filename);
+
+void		edit_mode_update(t_rt *rt);
+void		update_camera_movement(t_rt *rt);
+t_ray		ray_from_screen_point(t_rt *rt, t_vec2f point, t_bool invert_t);
 
 void		clear_frame(t_rt *rt, t_vec4f color);
 void		render_pixel(t_rt *rt, t_int px_x, t_int px_y);

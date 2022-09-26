@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 13:49:37 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 14:23:59 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 14:35:43 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,50 +125,32 @@ typedef enum e_key
 typedef struct s_image
 {
 	void		*ptr;
-	// void		*addr;
 	t_int		bits_per_pixel;
 	t_int		size_line;
 	t_int		endian;
 }	t_image;
 
-// typedef struct s_window
-// {
-// 	t_s64		frame_width;
-// 	t_s64		frame_height;
-// 	void		*mlx;
-// 	void		*window;
-// 	t_image		img;
-// 	void		*pixels;
-// 	t_bool		opened;
-// }	t_window;
+typedef t_u8	t_key_state;
 
 typedef struct s_window
 {
 	void	*mlx;
-	void	*window;
+	void	*mlx_win;
+	void	*mlx_frame_img;
+	int		frame_bits_per_px;
+	int		frame_line_size;
+	int		frame_endianness;
 	t_s64	frame_width;
 	t_s64	frame_height;
-	t_image	image;
 	void	*pixels;
-	t_key	inputs[512];
+	t_bool	prev_inputs[512];
+	t_bool	inputs[512];
 	t_vec2f	mouse_coords;
 	t_bool	opened;
 }	t_window;
 
-// typedef struct s_rt t_rt;
-
-// t_bool	create_window(t_window *win, t_str title, int width, int height);
-// void	destroy_window(t_window *win);
-// // t_bool	allocate_framebuffer(t_window *win, t_int width, t_int height);
-// void	poll_window_events(t_window *win);
-// void	update_window(t_window *win);
-
-// void	set_pixel(t_window *win, int x, int y, t_vec4f color);
-
-// INPUTS
+typedef void	*t_thread;
 
 void	init_events(t_window *win);
-// t_vec2f	get_mouse_pos(t_window *win);
-// t_bool	is_key_down(t_window *win, int code);
 
 #endif

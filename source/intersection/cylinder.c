@@ -81,8 +81,8 @@ static t_bool	ray_cylinder_body_intersection(t_ray ray, t_cylinder cyl,
 	return (FALSE);
 }
 
-static t_bool	ray_cylinder_caps_intersection(t_ray ray, t_cylinder cyl,
-	t_dat *dat, t_hit_res *res)
+static t_bool	ray_cylinder_caps_intersection(t_ray ray, t_dat *dat,
+	t_hit_res *res)
 {
 	if (dat->y < 0)
 		dat->t = -dat->up_on_bot_to_ori / dat->dir_on_cyl;
@@ -112,7 +112,7 @@ t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_res *res)
 		return (FALSE);
 	if (ray_cylinder_body_intersection (ray, cyl, &dat, res))
 		return (TRUE);
-	if (ray_cylinder_caps_intersection (ray, cyl, &dat, res))
+	if (ray_cylinder_caps_intersection (ray, &dat, res))
 		return (TRUE);
 	if (res)
 		res->hit = FALSE;
