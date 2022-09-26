@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 14:31:26 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/23 15:59:18 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 14:11:21 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	set_pixel(t_window *win, int x, int y, t_vec4f color)
 	color.y = ft_clampf (color.y, 0, 1);
 	color.z = ft_clampf (color.z, 0, 1);
 	dst = win->pixels + (y * win->frame_line_size + x * (win->frame_bits_per_px / 8));
-	*dst = (((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
+	*(t_u32 *)dst = (((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
 			| ((t_u8)(color.z * 255));
 }
 
