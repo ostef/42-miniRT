@@ -24,12 +24,18 @@ typedef struct s_px_data
 	t_vec4f		color;
 }	t_px_data;
 
+#ifdef FT_WIN32
+# define INVERT_Y 1
+#else
+# define INVERT_Y 0
+#endif
+
 void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 {
 	t_ray		ray;
 	t_px_data	dat;
 
-	ray = ray_from_screen_point (rt, ft_vec2f (px_x + 0.5f, px_y + 0.5f), TRUE);
+	ray = ray_from_screen_point (rt, ft_vec2f (px_x + 0.5f, px_y + 0.5f), INVERT_Y);
 	dat.hit = raycast_closest (rt, ray);
 	if (dat.hit.object)
 	{
