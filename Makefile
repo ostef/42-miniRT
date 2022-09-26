@@ -2,7 +2,7 @@
 # so this is how we know we're on Windows
 
 SRC_DIR = source
-SRC_FILES = main.c objects.c\
+SRC_FILES = main.c objects.c camera.c edit_mode.c\
 	parsing/parsing.c parsing/parse_info.c parsing/parsing_utils.c raycast.c transform.c\
 	intersection/sphere.c intersection/cylinder.c intersection/plane.c intersection/object.c\
 	render/clear_frame.c render/render_pixel.c
@@ -18,6 +18,7 @@ SRC_FILES += win32_layer/window.c win32_layer/input.c win32_layer/loop.c win32_l
 else
 
 SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/render.c
+
 endif
 
 BONUS_SRC_FILES := $(SRC_FILES) render/render_frame_mt.c
