@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 15:33:55 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 15:45:25 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 17:24:41 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ t_error	parse_sphere(t_pcstr *line_split, t_rt *rt)
 	if (!line_split[1].data || !line_split[2].data || !line_split[3].data || line_split[4].data)
 		return (ERR_FORMAT);
 	object = add_object(rt);
-	object->shape = SPHERE;
+	object->type = SPHERE;
 	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &object->sphere.center);
 	if (code != ERR_OK)
 		return (code);
@@ -44,7 +44,7 @@ t_error	parse_plane(t_pcstr *line_split, t_rt *rt)
 	if (!line_split[1].data || !line_split[2].data || !line_split[3].data || line_split[4].data)
 		return (ERR_FORMAT);
 	object = add_object(rt);
-	object->shape = PLANE;
+	object->type = PLANE;
 	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &object->plane.origin);
 	if (code != ERR_OK)
 		return (code);
@@ -67,7 +67,7 @@ t_error	parse_cylinder(t_pcstr *line_split, t_rt *rt)
 	if (!line_split[1].data || !line_split[2].data || !line_split[3].data || !line_split[4].data || !line_split[5].data || line_split[6].data)
 		return (ERR_FORMAT);
 	object = add_object(rt);
-	object->shape = CYLINDER;
+	object->type = CYLINDER;
 	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &coordinate);
 	if (code != ERR_OK)
 		return (code);
@@ -136,21 +136,24 @@ t_error	parse_ambient_light(t_pcstr *line_split, t_vec4f *light)
 
 t_error	parse_light(t_pcstr *line_split, t_rt *rt)
 {
-	t_error			code;
 	static t_bool	first = TRUE;
+	t_error			code;
+	t_vec3f			pos;
+	t_vec4f			col;
 	
 	if (!first)
 		return (ERR_DOUBLE_LIGHT);
 	first = FALSE;
 	if (!line_split[1].data || !line_split[2].data || !line_split[3].data || line_split[4].data)
 		return (ERR_FORMAT);
-	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &rt->light_position);
+	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &pos);
 	if (code != ERR_OK)
 		return (code);
-	code = parse_float_f(ft_dup_split_str(line_split[2]), &rt->light_color.w); //check range [0, 1]
+	code = parse_float_f(ft_dup_split_str(line_split[2]), &col.w); //check range [0, 1]
 	if (code != ERR_OK)
 		return (code);
-	code = parse_color_f(ft_dup_split_str(line_split[3]), &rt->light_color.rgb);
+	code = parse_color_f(ft_dup_split_str(line_split[3]), &col.rgb);
+	add_light (rt, pos, col);
 	return (code);
 }
 

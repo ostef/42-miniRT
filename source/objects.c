@@ -23,6 +23,7 @@ t_object	*add_object(t_rt *rt)
 	}
 	rt->obj_count += 1;
 	obj = &rt->objs[rt->obj_count - 1];
+	ft_memset (obj, 0, sizeof (t_object));
 	obj->color = ft_vec4f (1, 1, 1, 1);
 	return (obj);
 }
@@ -32,7 +33,7 @@ t_object	*add_sphere(t_rt *rt, t_vec3f center, t_f32 radius)
 	t_object	*obj;
 
 	obj = add_object(rt);
-	obj->shape = SPHERE;
+	obj->type = SPHERE;
 	obj->sphere.center = center;
 	obj->sphere.radius = radius;
 	return (obj);
@@ -43,7 +44,7 @@ t_object	*add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius)
 	t_object	*obj;
 
 	obj = add_object(rt);
-	obj->shape = CYLINDER;
+	obj->type = CYLINDER;
 	obj->cylinder.bottom = bottom;
 	obj->cylinder.top = top;
 	obj->cylinder.radius = radius;
@@ -55,9 +56,20 @@ t_object	*add_plane(t_rt *rt, t_vec3f origin, t_vec3f normal)
 	t_object	*obj;
 
 	obj = add_object(rt);
-	obj->shape = PLANE;
+	obj->type = PLANE;
 	obj->plane.origin = origin;
 	obj->plane.normal = ft_vec3f_normalized(normal);
+	return (obj);
+}
+
+t_object	*add_light(t_rt *rt, t_vec3f position, t_vec4f color)
+{
+	t_object	*obj;
+
+	obj = add_object(rt);
+	obj->type = LIGHT;
+	obj->light.pos = position;
+	obj->color = color;
 	return (obj);
 }
 

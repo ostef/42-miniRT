@@ -96,20 +96,20 @@ void	edit_mode_update(t_rt *rt)
 		}
 		if (is_key_pressed (&rt->win, KEY_P))
 		{
-			if (rt->selected_object->shape == SPHERE)
+			if (rt->selected_object->type == SPHERE)
 			{
 				rt->selected_object->cylinder = sphere_to_cylinder (rt->selected_object->sphere);
-				rt->selected_object->shape = CYLINDER;
+				rt->selected_object->type = CYLINDER;
 			}
-			else if (rt->selected_object->shape == CYLINDER)
+			else if (rt->selected_object->type == CYLINDER)
 			{
 				rt->selected_object->plane = cylinder_to_plane (rt->selected_object->cylinder);
-				rt->selected_object->shape = PLANE;
+				rt->selected_object->type = PLANE;
 			}
-			else if (rt->selected_object->shape == PLANE)
+			else if (rt->selected_object->type == PLANE)
 			{
 				rt->selected_object->sphere = plane_to_sphere (rt->selected_object->plane);
-				rt->selected_object->shape = SPHERE;
+				rt->selected_object->type = SPHERE;
 			}
 		}
 		t_vec3f	translation = ft_vec3f (

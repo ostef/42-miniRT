@@ -47,13 +47,14 @@ t_bool		is_key_down(t_window *win, t_key key);
 t_bool		is_key_pressed(t_window *win, t_key key);
 t_bool		is_key_released(t_window *win, t_key key);
 
-typedef enum e_shape
+typedef enum e_obj_type
 {
 	UNKNOWN_SHAPE = 0,
 	SPHERE,
 	CYLINDER,
-	PLANE
-}	t_shape;
+	PLANE,
+	LIGHT
+}	t_obj_type;
 
 typedef struct s_sphere
 {
@@ -74,14 +75,20 @@ typedef struct s_plane
 	t_vec3f	normal;
 }	t_plane;
 
+typedef struct s_light
+{
+	t_vec3f	pos;
+}	t_light;
+
 typedef struct s_object
 {
-	t_shape			shape;
+	t_obj_type		type;
 	union
 	{
 		t_sphere	sphere;
 		t_cylinder	cylinder;
 		t_plane		plane;
+		t_light		light;
 	};
 	t_vec4f			color;
 }	t_object;
@@ -109,8 +116,6 @@ typedef struct s_rt
 {
 	t_window	win;
 	t_camera	camera;
-	t_vec3f		light_position;
-	t_vec4f		light_color;
 	t_vec4f		ambient_light;
 	t_object	*objs;
 	t_s64		obj_count;
@@ -123,6 +128,7 @@ t_object	*add_object(t_rt *rt);
 t_object	*add_sphere(t_rt *rt, t_vec3f center, t_f32 radius);
 t_object	*add_cylinder(t_rt *rt, t_vec3f bottom, t_vec3f top, t_f32 radius);
 t_object	*add_plane(t_rt *rt, t_vec3f origin, t_vec3f normal);
+t_object	*add_light(t_rt *rt, t_vec3f position, t_vec4f color);
 void		remove_object(t_rt *rt, t_s64 index);
 
 void		translate_object(t_object *obj, t_vec3f amount);
