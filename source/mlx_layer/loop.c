@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:09:54 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/23 15:46:57 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 14:42:28 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ static int	loop_wrapper(void *data)
 	ft_memcpy (loop.win->prev_inputs, loop.win->inputs,
 		sizeof (loop.win->prev_inputs));
 	loop.f (loop.data);
+	update_window (loop.win);
 }
 
 void	main_loop(t_window *win, int (*f)(void *), void *data)

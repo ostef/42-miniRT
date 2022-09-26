@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 16:03:34 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 13:59:20 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 14:43:03 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ int	on_mouse_press(int keycode, int x, int y, void *win)
 {
 	t_window	*window;
 
+	printf("%d\n", keycode);
 	window = (t_window *)win;
 	window->inputs[keycode + 500] = TRUE;
 	return (0);

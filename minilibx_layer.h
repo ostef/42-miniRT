@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minilibx_layer.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 13:49:37 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/23 16:04:26 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 14:35:43 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,13 @@
 # include "mlx.h"
 # include "libft.h"
 # include "ft_math.h"
+# include <pthread.h>
 
+typedef struct s_thread {
+	int 		(*routine)(void *);
+	void		*data;
+	pthread_t	thread;
+}	t_thread;
 typedef enum e_x11event
 {
 	KEY_PRESS = 2,
@@ -112,7 +118,8 @@ typedef enum e_key
 	KEY_PAGE_DOWN = 121,
 	KEY_F2 = 120,
 	KEY_CTRL = 256,
-	KEY_SHIFT = 257
+	KEY_SHIFT = 257,
+	MOUSE_LEFT = 501
 }	t_key;
 
 typedef struct s_image

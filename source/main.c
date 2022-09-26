@@ -16,7 +16,7 @@ int	tick(void *ptr)
 {
 	t_rt	*rt;
 
-	t_u64	start = GetTickCount64 ();
+	// t_u64	start = GetTickCount64 ();
 	rt = (t_rt *)ptr;
 	rt->camera.width = rt->win.frame_width;
 	rt->camera.height = rt->win.frame_height;
@@ -33,8 +33,6 @@ int	tick(void *ptr)
 		update_camera_movement (rt);
 	clear_frame (rt, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
 	render_frame (rt);
-	t_u64	end = GetTickCount64 ();
-	ft_println ("%u", (end - start));
 	return (0);
 }
 

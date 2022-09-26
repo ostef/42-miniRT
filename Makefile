@@ -17,8 +17,7 @@ SRC_FILES += win32_layer/window.c win32_layer/input.c win32_layer/loop.c win32_l
 
 else
 
-SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/render.c
-
+SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/render.c mlx_layer/threads.c
 endif
 
 BONUS_SRC_FILES := $(SRC_FILES) render/render_frame_mt.c
@@ -43,7 +42,7 @@ INCLUDE_DIRS += mlx
 LIB_DIRS += mlx
 LIBS += mlx
 CC = gcc
-C_FLAGS = -Wall -Wextra -Werror $(addprefix -I, $(INCLUDE_DIRS))
+C_FLAGS = $(addprefix -I, $(INCLUDE_DIRS)) # -Wall -Wextra -Werror
 DEPENDENCIES = miniRT.h libft/libft.a ft_math/libft_math.a mlx/libmlx.a Makefile
 
 endif
@@ -73,7 +72,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPENDENCIES)
 	$(CC) $(C_FLAGS) -c $< -o $@
 
 $(NAME): $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
-	$(CC) $(C_FLAGS) $? libft/libft.a ft_math/libft_math.a -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+	$(CC) $(C_FLAGS) $^ libft/libft.a ft_math/libft_math.a -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
 bonus: libft ft_math mlx bonus_exe
 

@@ -32,12 +32,13 @@ enum
 };
 
 t_bool		create_window(t_window *win, t_cstr title, int width, int height);
+void		update_window(t_window *win);
 void		destroy_window(t_window *win);
 void		main_loop(t_window *win, int (*f)(void *), void *data);
 void		set_pixel(t_window *win, int x, int y, t_vec4f color);
 t_vec4f		get_pixel(t_window *win, int x, int y);
 
-t_thread	create_thread(int (*f)(void *), void *data);
+int			create_thread(t_thread *thread, int (*f)(void *), void *data);
 void		destroy_thread(t_thread t);
 void		wait_for_all_threads(t_thread *t, t_s64 n);
 
