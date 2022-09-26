@@ -21,10 +21,8 @@ int	tick(void *ptr)
 	rt->camera.height = rt->win.frame_height;
 	rt->camera.scale = tanf (rt->camera.fov_in_degrees * 0.5f * PI / 180.0f);
 	rt->camera.aspect_ratio = rt->camera.width / rt->camera.height;
-	ft_println ("Tick");
 	if (is_key_pressed (&rt->win, KEY_SPACE))
 	{
-		ft_println ("Space pressed");
 		rt->is_editing = !rt->is_editing;
 		rt->selected_object = NULL;
 	}
