@@ -42,9 +42,9 @@ void update_camera_movement(t_rt *rt)
 	rt->camera.yaw += (is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT)) * 2;
 	rt->camera.pitch += (is_key_down (&rt->win, KEY_UP) - is_key_down (&rt->win, KEY_DOWN)) * 2;
 	rt->camera.pitch = ft_clampf (rt->camera.pitch, -80, 80);
-	input.x = is_key_down (&rt->win, 'D') - is_key_down (&rt->win, 'A');
-	input.y = is_key_down (&rt->win, 'E') - is_key_down (&rt->win, 'Q');
-	input.z = is_key_down (&rt->win, 'W') - is_key_down (&rt->win, 'S');
+	input.x = is_key_down (&rt->win, KEY_D) - is_key_down (&rt->win, KEY_A);
+	input.y = is_key_down (&rt->win, KEY_E) - is_key_down (&rt->win, KEY_Q);
+	input.z = is_key_down (&rt->win, KEY_W) - is_key_down (&rt->win, KEY_S);
 	input = ft_vec3f_normalized (input);
 	if (is_key_down (&rt->win, KEY_SHIFT))
 		input = ft_vec3f_mulf (input, 10);

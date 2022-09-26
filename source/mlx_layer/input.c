@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 16:03:34 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 14:51:09 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 16:05:03 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 int	on_destroy(int keycode, void *win)
 {
-	if (ft_get_heap_allocations () != 0)
-		ft_fprintln (STDERR, "Found %i leaks.", ft_get_heap_allocations ());
 	exit(0);
 	(void)keycode;
 	(void)win;
@@ -59,7 +57,7 @@ int	on_mouse_release(int keycode, int x, int y, void *win)
 	t_window	*window;
 
 	window = (t_window *)win;
-	window->inputs[keycode + 500] = TRUE;
+	window->inputs[keycode + 500] = FALSE;
 	return (0);
 	(void)x;
 	(void)y;
@@ -82,17 +80,17 @@ t_vec2f	get_mouse_pos(t_window *win)
 
 t_bool	is_key_down(t_window *win, t_key key)
 {
-	return (win->inputs[key]);
+	return (win->curr_inputs[key]);
 }
 
 t_bool	is_key_pressed(t_window *win, t_key key)
 {
-	return (!win->prev_inputs[key] && win->inputs[key]);
+	return (!win->prev_inputs[key] && win->curr_inputs[key]);
 }
 
 t_bool	is_key_released(t_window *win, t_key key)
 {
-	return (win->prev_inputs[key] && !win->inputs[key]);
+	return (win->prev_inputs[key] && !win->curr_inputs[key]);
 }
 
 void	init_events(t_window *win)
