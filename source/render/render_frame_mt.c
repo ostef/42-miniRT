@@ -12,10 +12,6 @@
 
 #include "miniRT.h"
 
-#ifndef FT_WIN32
-# error "Multithreaded rendering is only implemented on Windows for now."
-#endif
-
 #ifndef THREADS_X
 # define THREADS_X 4
 #endif
@@ -54,7 +50,7 @@ static int	render_thread(void *param)
 
 void	render_frame(t_rt *rt)
 {
-	HANDLE			threads[THREADS_X * THREADS_Y];
+	t_thread		threads[THREADS_X * THREADS_Y];
 	t_thread_data	d[THREADS_X * THREADS_Y];
 	int				x;
 	int				y;
