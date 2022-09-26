@@ -49,8 +49,9 @@ void	rotate_object(t_object *obj, t_vec3f amount)
 	t_vec3f	cyl_c;
 	t_f32	cyl_h;
 
+	amount = ft_vec3f_mulf (amount, PI / 180.0f);
 	mat = get_rotation_matrix (obj);
-	mat = ft_mat3f_mul (mat, ft_mat3f_rotate_euler (ft_vec3f_mulf (amount, PI / 180.0f)));
+	mat = ft_mat3f_mul (mat, ft_mat3f_rotate_euler (amount));
 	if (obj->type == CYLINDER)
 	{
 		cyl_u = ft_mat3f_up_vector (mat);
