@@ -3,7 +3,7 @@
 
 SRC_DIR = source
 SRC_FILES = main.c objects.c camera.c edit_mode.c\
-	parsing/parsing.c parsing/parse_info.c parsing/parsing_utils.c raycast.c transform.c\
+	parsing/parsing.c parsing/parse_objects.c parsing/parse_elements.c parsing/parse_info.c parsing/parsing_utils.c parsing/ft_atof.c raycast.c transform.c\
 	intersection/sphere.c intersection/cylinder.c intersection/plane.c intersection/object.c\
 	render/clear_frame.c render/render_pixel.c
 OBJ_DIR = obj

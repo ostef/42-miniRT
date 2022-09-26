@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 14:03:52 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/23 15:22:23 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 18:10:37 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,17 +37,29 @@ typedef enum e_error {
 
 // Parse info
 
-t_error	parse_coordinate_f(t_str str, t_vec3f *result);
-t_error	parse_direction_f(t_str str, t_vec3f *result);
-t_error	parse_float_f(t_str str, t_f32 *result);
-t_error	parse_color_f(t_str str, t_vec3f *color);
+t_error	parse_coordinate(t_str str, t_vec3f *result, t_alloc arena);
+t_error	parse_direction(t_str str, t_vec3f *result, t_alloc arena);
+t_error	parse_float(t_str str, t_f32 *result);
+t_error	parse_color(t_str str, t_vec3f *color, t_alloc arena);
+
+// Parse objects
+
+t_error	parse_sphere(t_pcstr *line_split, t_rt *rt, t_alloc arena);
+t_error	parse_plane(t_pcstr *line_split, t_rt *rt, t_alloc arena);
+t_error	parse_cylinder(t_pcstr *line_split, t_rt *rt, t_alloc arena);
+
+// Parse elements
+
+t_error	parse_camera(t_pcstr *line_split, t_camera *camera, t_alloc arena);
+t_error	parse_ambient_light(t_pcstr *line_split, t_vec4f *light, t_alloc arena);
+t_error	parse_light(t_pcstr *line_split, t_rt *rt, t_alloc arena);
 
 // Utils
 
-t_str	ft_dup_split_str(t_pcstr split_str);
+t_str	ft_dup_split_str(t_pcstr split_str, t_alloc arena);
 void	ft_error(t_error code, t_uint nb_line);
-int		ft_pow(int nb, int power);
-t_bool	ft_is_decimal_number(t_cstr str);
+t_uint	get_len_split(t_pcstr *split);
+
 t_f32	ft_atof(t_cstr str);
 
 #endif
