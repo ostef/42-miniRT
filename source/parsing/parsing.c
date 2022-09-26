@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 15:33:55 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/22 17:02:53 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/23 15:22:23 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,20 +20,20 @@ t_error	parse_sphere(t_pcstr *line_split, t_rt *rt)
 	t_error		code;
 
 	if (!line_split[1].data || !line_split[2].data || !line_split[3].data || line_split[4].data)
-		return (FORMAT);
+		return (ERR_FORMAT);
 	object = add_object(rt);
 	object->shape = SPHERE;
 	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &object->sphere.center);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	code = parse_float_f(ft_dup_split_str(line_split[2]), &object->sphere.radius);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	object->sphere.radius /= 2;
 	code = parse_color_f(ft_dup_split_str(line_split[3]), &object->color.rgb);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
-	return (OK);
+	return (ERR_OK);
 }
 
 t_error	parse_plane(t_pcstr *line_split, t_rt *rt)
@@ -42,14 +42,14 @@ t_error	parse_plane(t_pcstr *line_split, t_rt *rt)
 	t_error		code;
 
 	if (!line_split[1].data || !line_split[2].data || !line_split[3].data || line_split[4].data)
-		return (FORMAT);
+		return (ERR_FORMAT);
 	object = add_object(rt);
 	object->shape = PLANE;
 	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &object->plane.origin);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	code = parse_direction_f(ft_dup_split_str(line_split[2]), &object->plane.normal);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	code = parse_color_f(ft_dup_split_str(line_split[3]), &object->color.rgb);
 	return (code);
@@ -65,20 +65,20 @@ t_error	parse_cylinder(t_pcstr *line_split, t_rt *rt)
 	t_error		code;
 
 	if (!line_split[1].data || !line_split[2].data || !line_split[3].data || !line_split[4].data || !line_split[5].data || line_split[6].data)
-		return (FORMAT);
+		return (ERR_FORMAT);
 	object = add_object(rt);
 	object->shape = CYLINDER;
 	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &coordinate);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	code = parse_direction_f(ft_dup_split_str(line_split[2]), &direction);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	code = parse_float_f(ft_dup_split_str(line_split[3]), &diameter);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	code = parse_float_f(ft_dup_split_str(line_split[4]), &height);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	object->cylinder.radius = diameter / 2;
 	object->cylinder.top = ft_vec3f_add(coordinate, ft_vec3f_mulf(direction, height / 2));
@@ -94,27 +94,27 @@ t_error	parse_camera(t_pcstr *line_split, t_camera *camera)
 	static t_bool	first = TRUE;
 	
 	if (!first)
-		return (DOUBLE_CAMERA);
+		return (ERR_DOUBLE_CAMERA);
 	first = FALSE;
 	if (!line_split[1].data || !line_split[2].data || !line_split[3].data || line_split[4].data)
-		return (FORMAT);
+		return (ERR_FORMAT);
 	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &camera->position);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	code = parse_direction_f(ft_dup_split_str(line_split[2]), &direction);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	(void)direction;
 	// camera->yaw = atan2f(direction.y, direction.x);
 	// t_f32 distance = sqrt(direction.z * direction.z + direction.x * direction.x);
 	// camera->pitch = asinf(direction.y / distance);
 	code = parse_float_f(ft_dup_split_str(line_split[3]), &camera->fov_in_degrees);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	if (camera->fov_in_degrees < 0 || camera->fov_in_degrees > 180)
-		return (RANGE_FOV);
+		return (ERR_RANGE_FOV);
 	camera->transform = ft_mat4f_identity();
-	return (OK);
+	return (ERR_OK);
 }
 
 t_error	parse_ambient_light(t_pcstr *line_split, t_vec4f *light)
@@ -123,15 +123,15 @@ t_error	parse_ambient_light(t_pcstr *line_split, t_vec4f *light)
 	static t_bool	first = TRUE;
 	
 	if (!first)
-		return (DOUBLE_AMBIENT_LIGHT);
+		return (ERR_DOUBLE_AMBIENT_LIGHT);
 	first = FALSE;
 	if (!line_split[1].data || !line_split[2].data || line_split[3].data)
-		return (FORMAT);
+		return (ERR_FORMAT);
 	code = parse_float_f(ft_dup_split_str(line_split[1]), &light->w);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	if (light->w < 0 || light->w > 1)
-		return (RANGE_BRIGHTNESS);
+		return (ERR_RANGE_BRIGHTNESS);
 	code = parse_color_f(ft_dup_split_str(line_split[2]), &light->rgb);
 	return (code);
 }
@@ -142,15 +142,15 @@ t_error	parse_light(t_pcstr *line_split, t_rt *rt)
 	static t_bool	first = TRUE;
 	
 	if (!first)
-		return (DOUBLE_LIGHT);
+		return (ERR_DOUBLE_LIGHT);
 	first = FALSE;
 	if (!line_split[1].data || !line_split[2].data || !line_split[3].data || line_split[4].data)
-		return (FORMAT);
+		return (ERR_FORMAT);
 	code = parse_coordinate_f(ft_dup_split_str(line_split[1]), &rt->light_position);
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	code = parse_float_f(ft_dup_split_str(line_split[2]), &rt->light_color.w); //check range [0, 1]
-	if (code != OK)
+	if (code != ERR_OK)
 		return (code);
 	code = parse_color_f(ft_dup_split_str(line_split[3]), &rt->light_color.rgb);
 	return (code);
@@ -163,9 +163,9 @@ t_error	parse_line(t_str line, t_rt *rt)
 
 	line_split = ft_split(line, ' ', ft_heap());
 	if (!line_split)
-		return (FORMAT);
+		return (ERR_FORMAT);
 	if (!line_split[0].data)
-		return (FORMAT);
+		return (ERR_FORMAT);
 	if (ft_strncmp(line_split[0].data, "sp", line_split[0].len) == 0)
 		code = parse_sphere(line_split, rt);
 	else if (ft_strncmp(line_split[0].data, "pl", line_split[0].len) == 0)
@@ -179,7 +179,7 @@ t_error	parse_line(t_str line, t_rt *rt)
 	else if (ft_strncmp(line_split[0].data, "L", line_split[0].len) == 0)
 		code = parse_light(line_split, rt);
 	else
-		code = IDENTIFIER;
+		code = ERR_IDENTIFIER;
 	ft_free(line, ft_heap());
 	ft_free(line_split, ft_heap());
 	return (code);
@@ -190,13 +190,13 @@ t_error	check_filename(t_cstr filename)
 	t_cstr	extension;
 	
 	if (!filename)
-		return (NO_FILENAME);
+		return (ERR_NO_FILENAME);
 	extension = ft_strrchr(filename, '.');
 	if (!extension)
-		return (FILENAME);
+		return (ERR_FILENAME);
 	if (ft_strcmp(extension, ".rt") != 0)
-		return (FILENAME);
-	return (OK);
+		return (ERR_FILENAME);
+	return (ERR_OK);
 }
 
 t_rt	parsing(t_str filename)
@@ -208,20 +208,20 @@ t_rt	parsing(t_str filename)
 	t_error	code;
 
 	code = check_filename(filename);
-	if (code != OK)
+	if (code != ERR_OK)
 		ft_error(code, 0);
 	ft_memset(&output, 0, sizeof(t_rt));
 	file_content = ft_read_entire_file(filename, ft_heap());
 	if (!file_content)
-		ft_error(FILE_CONTENT, 0);
+		ft_error(ERR_FILE_CONTENT, 0);
 	content_splited = ft_split(file_content, '\n', ft_heap());
 	if (!content_splited)
-		ft_error(FILE_CONTENT, 0);
+		ft_error(ERR_FILE_CONTENT, 0);
 	i = 0;
 	while (content_splited[i].data)
 	{
 		code = parse_line(ft_dup_split_str(content_splited[i]), &output);
-		if (code != OK)
+		if (code != ERR_OK)
 			ft_error(code, i + 1);
 		i++;
 	}

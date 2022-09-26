@@ -1,29 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   threads.c                                          :+:      :+:    :+:   */
+/*   object.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/20 17:33:03 by soumanso          #+#    #+#             */
-/*   Updated: 2022/09/20 17:33:03 by soumanso         ###   ########lyon.fr   */
+/*   Created: 2022/09/24 14:39:55 by soumanso          #+#    #+#             */
+/*   Updated: 2022/09/24 14:39:55 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-int	create_thread(t_thread *thread, int (*f)(void *), void *data)
+t_bool	ray_object_intersection(t_ray ray, t_object *obj, t_hit_res *res)
 {
-	*thread = CreateThread (NULL, 0, f, data, 0, NULL);
-	return (1);
-}
+	t_bool	hit;
 
-void	destroy_thread(t_thread t)
-{
-	CloseHandle (t);
-}
-
-void	wait_for_threads(t_thread *t, t_s64 n)
-{
-	WaitForMultipleObjects(n, t, TRUE, INFINITE);
+	hit = FALSE;
+	if (obj->shape == SPHERE)
+		hit = ray_sphere_intersection (ray, obj->sphere, res);
+	else if (obj->shape == CYLINDER)
+		hit = ray_cylinder_intersection (ray, obj->cylinder, res);
+	else if (obj->shape == PLANE)
+		hit = ray_plane_intersection (ray, obj->plane, res);
+	if (hit)
+		res->object = obj;
+	return (hit);
 }

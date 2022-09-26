@@ -1,29 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   threads.c                                          :+:      :+:    :+:   */
+/*   clear_frame.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/20 17:33:03 by soumanso          #+#    #+#             */
-/*   Updated: 2022/09/20 17:33:03 by soumanso         ###   ########lyon.fr   */
+/*   Created: 2022/09/24 14:55:59 by soumanso          #+#    #+#             */
+/*   Updated: 2022/09/24 14:55:59 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-int	create_thread(t_thread *thread, int (*f)(void *), void *data)
+void	clear_frame(t_rt *rt, t_vec4f color)
 {
-	*thread = CreateThread (NULL, 0, f, data, 0, NULL);
-	return (1);
-}
+	int	x;
+	int	y;
 
-void	destroy_thread(t_thread t)
-{
-	CloseHandle (t);
-}
-
-void	wait_for_threads(t_thread *t, t_s64 n)
-{
-	WaitForMultipleObjects(n, t, TRUE, INFINITE);
+	y = 0;
+	while (y < rt->win.frame_height)
+	{
+		x = 0;
+		while (x < rt->win.frame_width)
+		{
+			set_pixel (&rt->win, x, y, color);
+			x += 1;
+		}
+		y += 1;
+	}
 }

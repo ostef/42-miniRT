@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 14:31:26 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 13:39:09 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 13:58:15 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ void	set_pixel(t_window *win, int x, int y, t_vec4f color)
 {
 	char	*dst;
 
+	y = win->frame_height - y;
 	color.x = ft_clampf (color.x, 0, 1);
 	color.y = ft_clampf (color.y, 0, 1);
 	color.z = ft_clampf (color.z, 0, 1);

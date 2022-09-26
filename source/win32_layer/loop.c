@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   loop.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:06:21 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/22 18:28:52 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/23 16:16:54 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,19 @@ static void	poll_window_events(t_window *win)
 	MSG	msg;
 	int	key;
 
+	key = 0;
+	while (key < 256)
+	{
+		if (win->key_states[key] == KS_PRESSED)
+			win->key_states[key] = KS_DOWN;
+		else if (win->key_states[key] == KS_RELEASED)
+			win->key_states[key] = KS_UP;
+		key += 1;
+	}
 	while (PeekMessageA (&msg, win->hwnd, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage (&msg);
 		DispatchMessageA (&msg);
-	}
-	ft_memcpy (win->prev_key_states, win->curr_key_states, sizeof (win->prev_key_states));
-	key = 0;
-	while (key < 256)
-	{
-		win->curr_key_states[key] = is_key_down (win, key);
-		key += 1;
 	}
 }
 

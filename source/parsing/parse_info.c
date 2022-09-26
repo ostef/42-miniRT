@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_info.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 14:03:25 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/22 15:33:16 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/23 15:22:23 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ t_error	parse_coordinate_f(t_str str, t_vec3f *result)
 	{
 		ft_free(split, ft_heap());
 		ft_free(str, ft_heap());
-		return (FORMAT_COORDINATE);
+		return (ERR_FORMAT_COORDINATE);
 	}
 	x = ft_strndup(split[0].data, split[0].len, ft_heap());
 	y = ft_strndup(split[1].data, split[1].len, ft_heap());
@@ -38,8 +38,8 @@ t_error	parse_coordinate_f(t_str str, t_vec3f *result)
 	ft_free(y, ft_heap());
 	ft_free(z, ft_heap());
 	if (result->x == NAN || result->y == NAN || result->z == NAN)
-		return (FLOAT);
-	return (OK);
+		return (ERR_FLOAT);
+	return (ERR_OK);
 }
 
 t_error	parse_direction_f(t_str str, t_vec3f *result)
@@ -54,7 +54,7 @@ t_error	parse_direction_f(t_str str, t_vec3f *result)
 	{
 		ft_free(split, ft_heap());
 		ft_free(str, ft_heap());
-		return (FORMAT_DIRECTION);
+		return (ERR_FORMAT_DIRECTION);
 	}
 	x = ft_strndup(split[0].data, split[0].len, ft_heap());
 	y = ft_strndup(split[1].data, split[1].len, ft_heap());
@@ -66,11 +66,11 @@ t_error	parse_direction_f(t_str str, t_vec3f *result)
 	ft_free(y, ft_heap());
 	ft_free(z, ft_heap());
 	if (result->x == NAN || result->y == NAN || result->z == NAN)
-		return (FLOAT);
+		return (ERR_FLOAT);
 	if (result->x > 1 || result->x < -1 || result->y > 1 || result->y < -1
 		|| result->z > 1 || result->z < -1)
-		return (RANGE_DIRECTION);
-	return (OK);
+		return (ERR_RANGE_DIRECTION);
+	return (ERR_OK);
 }
 
 t_error	parse_float_f(t_str str, t_f32 *result)
@@ -78,8 +78,8 @@ t_error	parse_float_f(t_str str, t_f32 *result)
 	*result = ft_atof(str);
 	ft_free(str, ft_heap());
 	if (isnan(*result))
-		return (FLOAT);
-	return (OK);
+		return (ERR_FLOAT);
+	return (ERR_OK);
 }
 
 t_error	parse_color_f(t_str str, t_vec3f *color)
@@ -94,7 +94,7 @@ t_error	parse_color_f(t_str str, t_vec3f *color)
 	{
 		ft_free(split, ft_heap());
 		ft_free(str, ft_heap());
-		return (FORMAT_COLOR);
+		return (ERR_FORMAT_COLOR);
 	}	
 	r_str = ft_strndup(split[0].data, split[0].len, ft_heap());
 	g_str = ft_strndup(split[1].data, split[1].len, ft_heap());
@@ -108,9 +108,9 @@ t_error	parse_color_f(t_str str, t_vec3f *color)
 	ft_free(g_str, ft_heap());
 	ft_free(b_str, ft_heap());
 	if (color->x == NAN || color->y == NAN || color->z == NAN)
-		return (FLOAT);
+		return (ERR_FLOAT);
 	if (color->r < 0 || color->g < 0 || color->b < 0 || color->r > 255
 		|| color->g > 255 || color->b > 255)
-		return (RANGE_COLOR);
-	return (OK);
+		return (ERR_RANGE_COLOR);
+	return (ERR_OK);
 }

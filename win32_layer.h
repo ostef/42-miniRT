@@ -17,6 +17,8 @@
 # include "ft_math.h"
 # include <Windows.h>
 
+typedef t_u8	t_key_state;
+
 typedef struct s_window
 {
 	HWND		hwnd;
@@ -24,8 +26,7 @@ typedef struct s_window
 	t_s64		frame_height;
 	void		*pixels;
 	t_bool		opened;
-	t_bool		prev_key_states[256];
-	t_bool		curr_key_states[256];
+	t_key_state	key_states[256];
 }	t_window;
 
 typedef enum e_key
@@ -114,9 +115,5 @@ typedef enum e_key
 }	t_key;
 
 typedef HANDLE	t_thread;
-
-t_thread	create_thread(int (*f)(void *), void *data);
-void		destroy_thread(t_thread t);
-void		wait_for_all_threads(t_thread *t, t_s64 n);
 
 #endif
