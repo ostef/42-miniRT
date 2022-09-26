@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   input.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 16:03:34 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/22 18:44:22 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 13:59:20 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minilibx_layer.h"
 
-int	destroy(int keycode, void *win)
+int	on_destroy(int keycode, void *win)
 {
 	if (ft_get_heap_allocations () != 0)
 		ft_fprintln (STDERR, "Found %i leaks.", ft_get_heap_allocations ());
@@ -22,7 +22,7 @@ int	destroy(int keycode, void *win)
 	return (0);
 }
 
-int	keydown(int keycode, void *win)
+int	on_keydown(int keycode, void *win)
 {
 	t_window	*window;
 
@@ -33,7 +33,7 @@ int	keydown(int keycode, void *win)
 	return (0);
 }
 
-int	keyup(int keycode, void *win)
+int	on_keyup(int keycode, void *win)
 {
 	t_window	*window;
 
@@ -42,7 +42,7 @@ int	keyup(int keycode, void *win)
 	return (0);
 }
 
-int	mouse_press(int keycode, int x, int y, void *win)
+int	on_mouse_press(int keycode, int x, int y, void *win)
 {
 	t_window	*window;
 
@@ -53,7 +53,7 @@ int	mouse_press(int keycode, int x, int y, void *win)
 	(void)y;
 }
 
-int	mouse_release(int keycode, int x, int y, void *win)
+int	on_mouse_release(int keycode, int x, int y, void *win)
 {
 	t_window	*window;
 
@@ -64,7 +64,7 @@ int	mouse_release(int keycode, int x, int y, void *win)
 	(void)y;
 }
 
-int	mouse_move(int x, int y, void *win)
+int	on_mouse_move(int x, int y, void *win)
 {
 	t_window	*window;
 
@@ -74,6 +74,11 @@ int	mouse_move(int x, int y, void *win)
 	return (0);
 }
 
+t_vec2f	get_mouse_pos(t_window *win)
+{
+	return (win->mouse_coords);
+}
+
 t_bool	is_key_down(t_window *win, t_key key)
 {
 	return (win->inputs[key]);
@@ -81,21 +86,20 @@ t_bool	is_key_down(t_window *win, t_key key)
 
 t_bool	is_key_pressed(t_window *win, t_key key)
 {
-	return (win->inputs[key]);
+	return (!win->prev_inputs[key] && win->inputs[key]);
 }
 
-t_vec2f	get_mouse_pos(t_window *win)
+t_bool	is_key_released(t_window *win, t_key key)
 {
-	return (ft_vec2f(win->mouse_coords.x, win->mouse_coords.y));
+	return (win->prev_inputs[key] && !win->inputs[key]);
 }
-
 
 void	init_events(t_window *win)
 {
-	mlx_hook(win->window, MOUSE_PRESS, 0L, mouse_press, win);
-	mlx_hook(win->window, MOUSE_RELEASE, 0L, mouse_release, win);
-	mlx_hook(win->window, MOUSE_MOVE, 0L, mouse_move, win);
-	mlx_hook(win->window, KEY_PRESS, 0L, keydown, win);
-	mlx_hook(win->window, KEY_RELEASE, 0L, keyup, win);
-	mlx_hook(win->window, DESTROY_NOTIFY, 0L, destroy, win);
+	mlx_hook(win->window, MOUSE_PRESS, 0, on_mouse_press, win);
+	mlx_hook(win->window, MOUSE_RELEASE, 0, on_mouse_release, win);
+	mlx_hook(win->window, MOUSE_MOVE, 0, on_mouse_move, win);
+	mlx_hook(win->window, KEY_PRESS, 0, on_keydown, win);
+	mlx_hook(win->window, KEY_RELEASE, 0, on_keyup, win);
+	mlx_hook(win->window, DESTROY_NOTIFY, 0, on_destroy, win);
 }

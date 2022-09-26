@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   window.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 14:31:26 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/22 18:41:54 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/23 15:59:18 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,17 @@ t_bool	create_window(t_window *win, t_cstr title, int width, int height)
 	win->mlx = mlx_init();
 	if (!win->mlx)
 		return (FALSE);
-	win->window = mlx_new_window(win->mlx, width, height, (t_str)title);
-	if (!win->window)
+	win->mlx_win = mlx_new_window(win->mlx, width, height, (t_str)title);
+	if (!win->mlx_win)
 		return (FALSE);
-	win->image.ptr = mlx_new_image(win->mlx, width, height);
-	if (!win->image.ptr)
+	win->mlx_frame_img = mlx_new_image(win->mlx, width, height);
+	if (!win->mlx_frame_img)
 	{
-		mlx_destroy_window(win->mlx, win->window);
+		mlx_destroy_window(win->mlx, win->mlx_win);
 		return (FALSE);
 	}
-	win->pixels = mlx_get_data_addr(win->image.ptr, &win->image.bits_per_pixel,
-						&win->image.size_line, &win->image.endian);
+	win->pixels = mlx_get_data_addr(win->mlx_frame_img, &win->frame_bits_per_px,
+						&win->frame_line_size, &win->frame_endianness);
 	if (!win->pixels)
 	{
 		destroy_window(win);
@@ -42,13 +42,13 @@ t_bool	create_window(t_window *win, t_cstr title, int width, int height)
 
 void	destroy_window(t_window *win)
 {
-	mlx_destroy_window(win->mlx, win->window);
-	mlx_destroy_image(win->mlx, win->image.ptr);
+	mlx_destroy_window(win->mlx, win->mlx_win);
+	mlx_destroy_image(win->mlx, win->mlx_frame_img);
 }
 
 void	update_window(t_window *win)
 {
-	mlx_put_image_to_window(win->mlx, win->window, win->image.ptr, 0, 0);
+	mlx_put_image_to_window(win->mlx, win->mlx_frame_img, win->mlx_frame_img, 0, 0);
 }
 
 void	set_pixel(t_window *win, int x, int y, t_vec4f color)
@@ -58,7 +58,19 @@ void	set_pixel(t_window *win, int x, int y, t_vec4f color)
 	color.x = ft_clampf (color.x, 0, 1);
 	color.y = ft_clampf (color.y, 0, 1);
 	color.z = ft_clampf (color.z, 0, 1);
-	dst = win->pixels + (y * win->image.size_line + x * (win->image.bits_per_pixel / 8));
+	dst = win->pixels + (y * win->frame_line_size + x * (win->frame_bits_per_px / 8));
 	*dst = (((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
 			| ((t_u8)(color.z * 255));
+}
+
+t_vec4f	get_pixel(t_window *win, int x, int y)
+{
+	t_u32	val;
+
+	val = *(t_u32 *)(win->pixels + (y * win->frame_line_size + x * (win->frame_bits_per_px / 8)));
+	return (ft_vec4f (
+				((val >> 16) & 0xff) / 255.0f,
+				((val >> 8) & 0xff) / 255.0f,
+				(val & 0xff) / 255.0f,
+				1));
 }
