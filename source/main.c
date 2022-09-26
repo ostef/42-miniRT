@@ -125,12 +125,12 @@ int	tick(void *ptr)
 		x = 0;
 		while (x < rt->win.frame_width)
 		{
-			set_pixel (&rt->win, x, y, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
+			set_pixel(&rt->win, x, y, ft_vec4f(0.5, 0.5, 0.5, 0));
+			// set_pixel (&rt->win, x, y, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
 			x += 1;
 		}
 		y += 1;
 	}
-
 	if (rt->is_editing)
 	{
 		if (is_key_pressed (&rt->win, KEY_SPACE))
@@ -240,6 +240,7 @@ int	tick(void *ptr)
 	}
 
 	render_frame (rt);
+	update_window(&rt->win);
 	return (0);
 }
 

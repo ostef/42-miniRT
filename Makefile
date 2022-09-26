@@ -69,7 +69,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPENDENCIES)
 	$(CC) $(C_FLAGS) -c $< -o $@
 
 $(NAME): $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
-	$(CC) $(C_FLAGS) $? libft/libft.a ft_math/libft_math.a -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
+	$(CC) $(C_FLAGS) $^ libft/libft.a ft_math/libft_math.a -Lmlx -lmlx -framework OpenGL -framework AppKit -o $(NAME)
 
 bonus: libft ft_math mlx bonus_exe
 
