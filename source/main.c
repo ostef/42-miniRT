@@ -33,7 +33,6 @@ int	tick(void *ptr)
 		update_camera_movement (rt);
 	clear_frame (rt, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
 	render_frame (rt);
-	update_window(&rt->win);
 	return (0);
 }
 

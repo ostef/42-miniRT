@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   window.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 14:31:26 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 14:37:52 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 14:57:19 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,23 +46,16 @@ void	destroy_window(t_window *win)
 	mlx_destroy_image(win->mlx, win->mlx_frame_img);
 }
 
-void	update_window(t_window *win)
-{
-	mlx_put_image_to_window(win->mlx, win->mlx_frame_img, win->mlx_frame_img, 0, 0);
-}
-
 void	set_pixel(t_window *win, int x, int y, t_vec4f color)
 {
 	char	*dst;
 
-	y = win->frame_height - y;
 	color.x = ft_clampf (color.x, 0, 1);
 	color.y = ft_clampf (color.y, 0, 1);
 	color.z = ft_clampf (color.z, 0, 1);
 	dst = win->pixels + (y * win->frame_line_size + x * (win->frame_bits_per_px / 8));
-	*dst = (((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
+	*(t_u32 *)dst = (((t_u8)(color.x * 255)) << 16) | (((t_u8)(color.y * 255)) << 8)
 			| ((t_u8)(color.z * 255));
-	// *dst = ((255 - x.a) << 24) | (x.r << 16) | (x.g << 8) | (x.b)
 }
 
 t_vec4f	get_pixel(t_window *win, int x, int y)

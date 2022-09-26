@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 13:49:37 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 14:38:58 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 15:37:38 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,8 +148,6 @@ typedef struct s_window
 	t_vec2f	mouse_coords;
 	t_bool	opened;
 }	t_window;
-
-// typedef void	*t_thread;
 
 void	init_events(t_window *win);
 

@@ -6,11 +6,11 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 16:03:34 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 14:47:07 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 15:37:44 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minilibx_layer.h"
+#include "miniRT.h"
 
 int	on_destroy(int keycode, void *win)
 {
