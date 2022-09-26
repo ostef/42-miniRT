@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 17:19:42 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 18:18:22 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/26 18:34:44 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,10 @@ t_error	parse_ambient_light(t_pcstr *split, t_vec4f *light, t_alloc arena)
 
 t_error	parse_light(t_pcstr *split, t_rt *rt, t_alloc arena)
 {
-	t_error			code;
 	static t_bool	first = TRUE;
+	t_error			code;
+	t_vec3f			position;
+	t_vec4f			color;
 
 	if (!first)
 		return (ERR_DOUBLE_LIGHT);
@@ -70,15 +72,16 @@ t_error	parse_light(t_pcstr *split, t_rt *rt, t_alloc arena)
 	if (get_len_split(split) != 4)
 		return (ERR_FORMAT);
 	code = parse_coordinate(ft_dup_split_str(split[1], arena),
-			&rt->light_position, arena);
+			&position, arena);
 	if (code != ERR_OK)
 		return (code);
-	code = parse_float(ft_dup_split_str(split[2], arena), &rt->light_color.w);
+	code = parse_float(ft_dup_split_str(split[2], arena), &color.w);
 	if (code != ERR_OK)
 		return (code);
-	if (rt->light_color.w > 1 || rt->light_color.w < 0)
+	if (color.w > 1 || color.w < 0)
 		return (ERR_RANGE_BRIGHTNESS);
 	code = parse_color(ft_dup_split_str(split[3], arena),
-			&rt->light_color.rgb, arena);
+			&color.rgb, arena);
+	add_light(rt, position, color);
 	return (code);
 }
