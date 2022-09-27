@@ -21,7 +21,6 @@ int	tick(void *ptr)
 	rt->camera.height = rt->win.frame_height;
 	rt->camera.scale = tanf (rt->camera.fov_in_degrees * 0.5f * PI / 180.0f);
 	rt->camera.aspect_ratio = rt->camera.width / rt->camera.height;
-	ft_println ("Tick");
 	if (is_key_pressed (&rt->win, KEY_SPACE))
 	{
 		ft_println ("Space pressed");
@@ -42,7 +41,11 @@ int	main(int ac, char **av)
 	t_rt	rt;
 
 	if (ac < 2 || ac > 3)
+	{
+		ft_fprintln (STDERR, "Error");
+		ft_fprintln (STDERR, "Start the program with a file as argument");
 		return (1);
+	}
 	ft_memset (&rt, 0, sizeof (rt));
 	rt = parsing(av[1]);
 	if (!create_window (&rt.win, "miniRT", 640, 480))
