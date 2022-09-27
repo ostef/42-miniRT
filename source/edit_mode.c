@@ -48,13 +48,14 @@ void	edit_mode_update(t_rt *rt)
 	t_ray		ray;
 	t_object	*new_obj;
 
-	
-	if (rt->selected_object)
+	if (is_key_pressed (&rt->win, KEY_C))
+		rt->is_picking_color = !rt->is_picking_color;
+	if (rt->is_picking_color)
 	{
-		if (is_key_pressed (&rt->win, KEY_C))
-			rt->is_picking_color = !rt->is_picking_color;
-		if (rt->is_picking_color)
+		if (rt->selected_object)
 			rt->selected_object->color = update_color_picker (rt, rt->selected_object->color, rt->selected_object->type == LIGHT);
+		else
+			rt->ambient_light = update_color_picker (rt, rt->ambient_light, TRUE);
 	}
 	if (rt->active_ui_elem != UI_NONE)
 		rt->ui_captured_mouse = TRUE;
