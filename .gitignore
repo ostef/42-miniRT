@@ -5,5 +5,7 @@
 *.lib
 miniRT
 *.exe
+*.ilk
+*.pdb
 .vscode/
 obj/

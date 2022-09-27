@@ -14,7 +14,8 @@
 
 t_bool	ray_object_intersection(t_ray ray, t_object *obj, t_hit_res *res)
 {
-	t_bool	hit;
+	t_bool		hit;
+	t_sphere	light_sphere;
 
 	hit = FALSE;
 	if (obj->type == SPHERE)
@@ -23,6 +24,12 @@ t_bool	ray_object_intersection(t_ray ray, t_object *obj, t_hit_res *res)
 		hit = ray_cylinder_intersection (ray, obj->cylinder, res);
 	else if (obj->type == PLANE)
 		hit = ray_plane_intersection (ray, obj->plane, res);
+	else if (obj->type == LIGHT)
+	{
+		light_sphere.center = obj->light.pos;
+		light_sphere.radius = 2.5f;
+		hit = ray_sphere_intersection (ray, light_sphere, res);
+	}
 	if (hit)
 		res->object = obj;
 	return (hit);

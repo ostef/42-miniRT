@@ -12,78 +12,72 @@
 
 #include "miniRT.h"
 
-
-t_plane	sphere_to_plane(t_sphere sph)
+void	change_object_type(t_object *obj)
 {
-	t_plane	res;
+	t_object	prev;
 
-	res.origin = sph.center;
-	res.normal = ft_vec3f (0, -1, 0);
-	return (res);
-}
-
-t_cylinder	sphere_to_cylinder(t_sphere sph)
-{
-	t_cylinder	res;
-
-	res.bottom = ft_vec3f_sub(sph.center, ft_vec3f(0, -sph.radius * 2, 0));
-	res.top = ft_vec3f_add(sph.center, ft_vec3f(0, -sph.radius * 2, 0));
-	res.radius = sph.radius;
-	return (res);
-}
-
-t_sphere	cylinder_to_sphere(t_cylinder cyl)
-{
-	t_sphere	res;
-
-	res.center = ft_vec3f_mulf (ft_vec3f_add (cyl.top, cyl.bottom), 0.5f);
-	res.radius = cyl.radius;
-	return (res);
-}
-
-t_plane	cylinder_to_plane(t_cylinder cyl)
-{
-	t_plane	res;
-
-	res.origin = ft_vec3f_mulf (ft_vec3f_add (cyl.top, cyl.bottom), 0.5f);
-	res.normal = ft_vec3f_normalized (ft_vec3f_sub (cyl.top, cyl.bottom));
-	return (res);
-}
-
-t_sphere	plane_to_sphere(t_plane pla)
-{
-	t_sphere	res;
-
-	res.center = pla.origin;
-	res.radius = 1;
-	return (res);
-}
-
-t_cylinder	plane_to_cylinder(t_plane pla)
-{
-	t_cylinder	res;
-
-	res.bottom = ft_vec3f_add (pla.origin, pla.normal);
-	res.top = ft_vec3f_sub (pla.origin, pla.normal);
-	res.radius = 1;
-	return (res);
+	prev = *obj;
+	if (obj->type == SPHERE)
+	{
+		obj->cylinder.bottom = ft_vec3f_sub(prev.sphere.center, ft_vec3f(0, -prev.sphere.radius * 2, 0));
+		obj->cylinder.top = ft_vec3f_add(prev.sphere.center, ft_vec3f(0, -prev.sphere.radius * 2, 0));
+		obj->cylinder.radius = prev.sphere.radius;
+		obj->type = CYLINDER;
+	}
+	else if (obj->type == CYLINDER)
+	{
+		obj->plane.origin = ft_vec3f_mulf (ft_vec3f_add (prev.cylinder.top, prev.cylinder.bottom), 0.5f);
+		obj->plane.normal = ft_vec3f_normalized (ft_vec3f_sub (prev.cylinder.top, prev.cylinder.bottom));
+		obj->type = PLANE;
+	}
+	else if (obj->type == PLANE)
+	{
+		obj->light.pos = prev.plane.origin;
+		obj->type = LIGHT;
+	}
+	else if (obj->type == LIGHT)
+	{
+		obj->sphere.center = prev.light.pos;
+		obj->sphere.radius = 1;
+		obj->type = SPHERE;
+	}
 }
 
 void	edit_mode_update(t_rt *rt)
 {
+	t_ray		ray;
+	t_object	*new_obj;
+
+	if (is_key_pressed (&rt->win, KEY_C))
+		rt->is_picking_color = !rt->is_picking_color;
+	if (rt->is_picking_color)
+	{
+		if (rt->selected_object)
+			rt->selected_object->color = update_color_picker (rt, rt->selected_object->color, rt->selected_object->type == LIGHT);
+		else
+			rt->ambient_light = update_color_picker (rt, rt->ambient_light, TRUE);
+	}
+	if (rt->active_ui_elem != UI_NONE)
+		rt->ui_captured_mouse = TRUE;
 	if (rt->obj_count > 0)
 	{
-		if (is_key_pressed (&rt->win, MOUSE_LEFT))
+		if (!rt->ui_captured_mouse && is_key_pressed (&rt->win, MOUSE_LEFT))
 		{
-			t_ray	ray;
-
-			ft_println ("Mouse left pressed");
 			ray = ray_from_screen_point (rt, get_mouse_pos (&rt->win), FALSE);
-			rt->selected_object = raycast_closest (rt, ray).object;
+			rt->selected_object = raycast_closest (rt, ray, FIL_ALL).object;
 		}
 	}
 	if (is_key_pressed (&rt->win, KEY_PLUS))
-		rt->selected_object = add_sphere (rt, ft_vec3f(0,0,0), 1);
+	{
+		if (rt->selected_object)
+		{
+			new_obj = add_object (rt);
+			*new_obj = *rt->selected_object;
+			rt->selected_object = new_obj;
+		}
+		else
+			rt->selected_object = add_sphere (rt, ft_vec3f(0,0,0), 1);
+	}
 	if (rt->selected_object)
 	{
 		if (is_key_pressed (&rt->win, KEY_MINUS))
@@ -94,24 +88,8 @@ void	edit_mode_update(t_rt *rt)
 			if (rt->selected_object < rt->objs)
 				rt->selected_object = NULL;
 		}
-		if (is_key_pressed (&rt->win, KEY_P))
-		{
-			if (rt->selected_object->type == SPHERE)
-			{
-				rt->selected_object->cylinder = sphere_to_cylinder (rt->selected_object->sphere);
-				rt->selected_object->type = CYLINDER;
-			}
-			else if (rt->selected_object->type == CYLINDER)
-			{
-				rt->selected_object->plane = cylinder_to_plane (rt->selected_object->cylinder);
-				rt->selected_object->type = PLANE;
-			}
-			else if (rt->selected_object->type == PLANE)
-			{
-				rt->selected_object->sphere = plane_to_sphere (rt->selected_object->plane);
-				rt->selected_object->type = SPHERE;
-			}
-		}
+		if (is_key_pressed (&rt->win, KEY_T))
+			change_object_type (rt->selected_object);
 		t_vec3f	translation = ft_vec3f (
 				is_key_down (&rt->win, KEY_D) - is_key_down (&rt->win, KEY_A),
 				is_key_down (&rt->win, KEY_E) - is_key_down (&rt->win, KEY_Q),
@@ -119,8 +97,8 @@ void	edit_mode_update(t_rt *rt)
 			);
 		translate_object (rt->selected_object, ft_mat4f_transform_vector (rt->camera.transform, translation));
 		rotate_object (rt->selected_object, ft_vec3f (
-			is_key_down (&rt->win, KEY_L) - is_key_down (&rt->win, KEY_J),
 			is_key_down (&rt->win, KEY_O) - is_key_down (&rt->win, KEY_U),
+			is_key_down (&rt->win, KEY_L) - is_key_down (&rt->win, KEY_J),
 			is_key_down (&rt->win, KEY_I) - is_key_down (&rt->win, KEY_K)
 		));
 		scale_object (rt->selected_object, ft_vec2f (
