@@ -48,9 +48,19 @@ void	edit_mode_update(t_rt *rt)
 	t_ray		ray;
 	t_object	*new_obj;
 
+	
+	if (rt->selected_object)
+	{
+		if (is_key_pressed (&rt->win, KEY_C))
+			rt->is_picking_color = !rt->is_picking_color;
+		if (rt->is_picking_color)
+			rt->selected_object->color = update_color_picker (rt, rt->selected_object->color, rt->selected_object->type == LIGHT);
+	}
+	if (rt->active_ui_elem != UI_NONE)
+		rt->ui_captured_mouse = TRUE;
 	if (rt->obj_count > 0)
 	{
-		if (is_key_pressed (&rt->win, MOUSE_LEFT))
+		if (!rt->ui_captured_mouse && is_key_pressed (&rt->win, MOUSE_LEFT))
 		{
 			ray = ray_from_screen_point (rt, get_mouse_pos (&rt->win), FALSE);
 			rt->selected_object = raycast_closest (rt, ray, FIL_ALL).object;

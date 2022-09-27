@@ -2,10 +2,12 @@
 # so this is how we know we're on Windows
 
 SRC_DIR = source
-SRC_FILES = main.c objects.c camera.c edit_mode.c\
-	parsing/parsing.c parsing/parse_objects.c parsing/parse_elements.c parsing/parse_info.c parsing/parsing_utils.c parsing/ft_atof.c raycast.c transform.c\
+SRC_FILES = main.c objects.c camera.c edit_mode.c raycast.c transform.c\
+	parsing/parsing.c parsing/parse_objects.c parsing/parse_elements.c parsing/parse_info.c parsing/parsing_utils.c parsing/ft_atof.c\
 	intersection/sphere.c intersection/cylinder.c intersection/plane.c intersection/object.c\
-	render/clear_frame.c render/render_pixel.c
+	render/clear_frame.c render/render_pixel.c\
+	draw/draw_pixel.c draw/draw_rect.c draw/draw_circle.c\
+	color_picker.c
 OBJ_DIR = obj
 INCLUDE_DIRS = libft ft_math parsing .
 LIB_DIRS = libft ft_math

@@ -77,9 +77,9 @@ void	render_pixel(t_rt *rt, t_int px_x, t_int px_y)
 		dat.hit = raycast_closest (rt, ray, FIL_SHAPES);
 	if (dat.hit.object)
 	{
-		if (rt->selected_object == dat.hit.object)
+		/*if (rt->selected_object == dat.hit.object)
 			set_pixel (&rt->win, px_x, px_y, ft_vec4f (1, 1, 1, 1));
-		else if (dat.hit.object->type == LIGHT)
+		else*/ if (dat.hit.object->type == LIGHT || rt->selected_object == dat.hit.object)
 			set_pixel (&rt->win, px_x, px_y, dat.hit.object->color);
 		else
 		{

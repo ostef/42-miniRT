@@ -26,12 +26,18 @@ int	tick(void *ptr)
 		rt->is_editing = !rt->is_editing;
 		rt->selected_object = NULL;
 	}
+	ft_memset (&rt->color_picker, 0, sizeof (t_color_picker));
+	if (!rt->keep_ui_elem_active)
+		rt->active_ui_elem = UI_NONE;
+	rt->keep_ui_elem_active = FALSE;
+	rt->ui_captured_mouse = FALSE;
 	if (rt->is_editing)
 		edit_mode_update (rt);
 	else
 		update_camera_movement (rt);
 	clear_frame (rt, ft_vec4f_mulf (rt->ambient_light, rt->ambient_light.w));
 	render_frame (rt);
+	draw_color_picker (rt);
 	return (0);
 }
 

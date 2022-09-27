@@ -112,16 +112,34 @@ typedef struct s_camera
 	t_f32	aspect_ratio;
 }	t_camera;
 
+typedef struct s_color_picker
+{
+	t_bool	opened;
+	t_bool	has_alpha;
+	t_vec4f	color;
+}	t_color_picker;
+
+typedef enum e_ui_id
+{
+	UI_NONE = 0,
+	UI_COLOR_RING
+}	t_ui_id;
+
 typedef struct s_rt
 {
-	t_window	win;
-	t_camera	camera;
-	t_vec4f		ambient_light;
-	t_object	*objs;
-	t_s64		obj_count;
-	t_s64		obj_cap;
-	t_bool		is_editing;
-	t_object	*selected_object;
+	t_window		win;
+	t_camera		camera;
+	t_vec4f			ambient_light;
+	t_object		*objs;
+	t_s64			obj_count;
+	t_s64			obj_cap;
+	t_bool			is_editing;
+	t_object		*selected_object;
+	t_bool			is_picking_color;
+	t_bool			ui_captured_mouse;
+	t_color_picker	color_picker;
+	t_ui_id			active_ui_elem;
+	t_bool			keep_ui_elem_active;
 }	t_rt;
 
 t_object	*add_object(t_rt *rt);
@@ -176,5 +194,15 @@ t_hit_res	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore, t_filter f
 t_hit_res	raycast_closest(t_rt *rt, t_ray ray, t_filter fil);
 t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore, t_filter fil);
 void		render_pixel(t_rt *rt, t_int px_x, t_int px_y);
+
+t_vec4f		update_color_picker(t_rt *rt, t_vec4f color, t_bool has_alpha);
+void		draw_color_picker(t_rt *rt);
+
+/* 2D Drawing functions (used for UI elements) */
+
+void	draw_pixel(t_rt *rt, int x, int y, t_vec4f color);
+void	draw_rect(t_rt *rt, t_vec2f min, t_vec2f max, t_vec4f color);
+void	draw_circle(t_rt *rt, t_vec2f center, t_f32 radius, t_vec4f color);
+void	draw_ring(t_rt *rt, t_vec2f center, t_vec2f radius, t_vec4f color);
 
 #endif
