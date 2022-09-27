@@ -41,7 +41,7 @@ void	draw_ring(t_rt *rt, t_vec2f center, t_vec2f radius, t_vec4f color)
 	t_f32	sqrd_len;
 
 	r2.x = radius.x * radius.x;
-	r2.x = radius.y * radius.y;
+	r2.y = radius.y * radius.y;
 	y = ft_max ((int)(center.y - radius.y), 0);
 	while (y <= (int)(center.y + radius.y) && y < rt->win.frame_height)
 	{
