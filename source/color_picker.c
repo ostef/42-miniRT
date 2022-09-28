@@ -63,58 +63,69 @@ t_vec4f	update_color_picker(t_rt *rt, t_vec4f color, t_bool has_alpha)
 {
 	t_vec2f	mouse_pos;
 	t_vec2f	center;
-	t_f32	radius;
+	t_vec2f	radius;
+	t_rectf	rect;
+	t_rectf	alpha_rect;
 
-	center = ft_vec2f_mulf (ft_vec2f_add (ft_vec2f (10, 10), ft_vec2f (10 + rt->win.frame_width * SCREEN_X_PERCENT, 10 + rt->win.frame_width * SCREEN_X_PERCENT)), 0.5f);
-	radius = rt->win.frame_width * SCREEN_X_PERCENT * 0.5f - 10;
+	rect = ft_rectf (10, 10,
+		rt->win.frame_width * SCREEN_X_PERCENT,
+		rt->win.frame_width * SCREEN_X_PERCENT);
+	if (has_alpha)
+		rect.h += 15;
+	center = ft_vec2f_add (rect.pos, ft_vec2f (rect.w * 0.5f, rect.w * 0.5f));
+	radius.y = rect.w * 0.5f - 10;
+	radius.x = radius.y * RING_INNER_RADIUS_PERCENT;
+	alpha_rect = ft_rectf (rect.x + 10, rect.y + rect.h - 15, rect.w - 20, 10);
 
 	rt->color_picker.opened = TRUE;
 	rt->color_picker.has_alpha = has_alpha;
 	rt->color_picker.color = color;
 	mouse_pos = get_mouse_pos (&rt->win);
-	if (mouse_pos.x >= 10 && mouse_pos.x <= 10 + rt->win.frame_width * SCREEN_X_PERCENT
-		&& mouse_pos.y >= 10 && mouse_pos.y <= 10 + rt->win.frame_width * SCREEN_X_PERCENT)
+	if (point_is_inside_rect (mouse_pos, rect))
 		rt->ui_captured_mouse = TRUE;
-	mouse_pos = ft_vec2f_sub (mouse_pos, center);
 	if (is_key_down (&rt->win, MOUSE_LEFT))
 	{
-		if (rt->active_ui_elem == UI_COLOR_RING
-			|| (ft_vec2f_sqrd_len (mouse_pos) > radius * radius * RING_INNER_RADIUS_PERCENT * RING_INNER_RADIUS_PERCENT && ft_vec2f_sqrd_len (mouse_pos) < radius * radius))
+		if (rt->active_ui_elem == UI_COLOR_RING || (rt->active_ui_elem == UI_NONE && point_is_inside_ring (mouse_pos, center, radius)))
 		{
 			rt->active_ui_elem = UI_COLOR_RING;
+			rt->keep_ui_elem_active = TRUE;
+		}
+		else if (has_alpha && (rt->active_ui_elem == UI_COLOR_ALPHA || (rt->active_ui_elem == UI_NONE && point_is_inside_rect (mouse_pos, alpha_rect))))
+		{
+			rt->active_ui_elem = UI_COLOR_ALPHA;
 			rt->keep_ui_elem_active = TRUE;
 		}
 	}
 	if (rt->active_ui_elem == UI_COLOR_RING)
 	{	
-		t_f32	degrees = atan2f (mouse_pos.y, mouse_pos.x) * 180 / PI;
+		t_f32	degrees = atan2f (mouse_pos.y - center.y, mouse_pos.x - center.x) * 180 / PI;
 		color.rgb = hsv_to_rgb (ft_vec3f (degrees, 1, 0.9));
 	}
+	else if (rt->active_ui_elem == UI_COLOR_ALPHA)
+		color.a = ft_clampf ((mouse_pos.x - alpha_rect.x) / alpha_rect.w, 0, 1);
 	rt->color_picker.color = color;
 	return (rt->color_picker.color);
 }
 
-static void	draw_hsv_circle(t_rt *rt, t_vec2f center, t_f32 radius)
+static void	draw_hsv_ring(t_rt *rt, t_vec2f center, t_vec2f radius)
 {
 	int		x;
 	int		y;
-	t_f32	r2;
+	t_vec2f	r2;
 	t_vec4f	color;
 	t_vec2f	p;
 
 	color.a = 1;
-	r2 = radius * radius;
-	y = ft_max ((int)(center.y - radius), 0);
-	while (y <= (int)(center.y + radius) && y < rt->win.frame_height)
+	r2 = ft_vec2f (radius.x * radius.x, radius.y * radius.y);
+	y = ft_max ((int)(center.y - radius.y), 0);
+	while (y <= (int)(center.y + radius.y) && y < rt->win.frame_height)
 	{
-		x = ft_max ((int)(center.x - radius), 0);
-		while (x <= (int)(center.x + radius) && x < rt->win.frame_width)
+		x = ft_max ((int)(center.x - radius.y), 0);
+		while (x <= (int)(center.x + radius.y) && x < rt->win.frame_width)
 		{
-			p = ft_vec2f (x - center.x, y - center.y);
-			if (ft_vec2f_sqrd_len (p) > r2 * RING_INNER_RADIUS_PERCENT * RING_INNER_RADIUS_PERCENT
-				&& ft_vec2f_sqrd_len (p) < r2)
+			if (point_is_inside_ring (ft_vec2f (x, y), center, radius))
 			{
-				t_f32	degrees = atan2f (p.y, p.x) * 180 / PI;
+				t_f32	degrees = atan2f (y - center.y, x - center.x) * 180 / PI;
 				color.rgb = hsv_to_rgb (ft_vec3f (degrees, 1, 0.9));
 				draw_pixel (rt, x, y, color);
 			}
@@ -126,20 +137,37 @@ static void	draw_hsv_circle(t_rt *rt, t_vec2f center, t_f32 radius)
 
 void	draw_color_picker(t_rt *rt)
 {
-	t_vec2f	min;
-	t_vec2f	max;
 	t_vec2f	center;
-	t_f32	radius;
+	t_vec2f	radius;
+	t_rectf	rect;
+	t_rectf	alpha_rect;
+	t_rectf	alpha_knob_rect;
+	t_f32	alpha;
 
 	if (!rt->color_picker.opened)
 		return ;
-	min = ft_vec2f (10, 10);
-	max = ft_vec2f (10 + rt->win.frame_width * SCREEN_X_PERCENT, 10 + rt->win.frame_width * SCREEN_X_PERCENT);
-	center = ft_vec2f_mulf (ft_vec2f_add (min, max), 0.5f);
-	radius = rt->win.frame_width * SCREEN_X_PERCENT * 0.5f - 10;
-	draw_rect (rt, min, max, ft_vec4f (0.2, 0.2, 0.2, 0.8));
-	draw_hsv_circle (rt, center, radius);
+	rect = ft_rectf (10, 10,
+		rt->win.frame_width * SCREEN_X_PERCENT,
+		rt->win.frame_width * SCREEN_X_PERCENT);
+	if (rt->color_picker.has_alpha)
+		rect.h += 15;
+	center = ft_vec2f_add (rect.pos, ft_vec2f (rect.w * 0.5f, rect.w * 0.5f));
+	radius.y = rect.w * 0.5f - 10;
+	radius.x = radius.y * RING_INNER_RADIUS_PERCENT;
+	alpha_rect = ft_rectf (rect.x + 10, rect.y + rect.h - 15, rect.w - 20, 10);
+	alpha = rt->color_picker.color.a;
+	alpha_knob_rect = ft_rectf (alpha_rect.x + alpha_rect.w * alpha, alpha_rect.y, 5, 10);
+
+	draw_rect (rt, rect, ft_vec4f (0.2, 0.2, 0.2, 0.8));
+	draw_hsv_ring (rt, center, radius);
 	t_vec3f	hsv = rgb_to_hsv (rt->color_picker.color.rgb);
 	t_vec2f	ring_point = ft_vec2f (cosf (hsv.x * PI / 180), sinf (hsv.x * PI / 180));
-	draw_ring (rt, ft_vec2f_add (center, ft_vec2f_mulf (ring_point, (radius + radius * RING_INNER_RADIUS_PERCENT) * 0.5f)), ft_vec2f (10, 12), ft_vec4f (1, 1, 1, 1));
+	ring_point = ft_vec2f_mulf (ring_point, (radius.x + radius.y) * 0.5f);
+	ring_point = ft_vec2f_add (center, ring_point);
+	draw_ring (rt, ring_point, ft_vec2f (10, 11), ft_vec4f (1, 1, 1, 1));
+	if (rt->color_picker.has_alpha)
+	{
+		draw_rect (rt, alpha_rect, ft_vec4f (0.3, 0.3, 0.3, 0.5));
+		draw_rect (rt, alpha_knob_rect, ft_vec4f (alpha, alpha, alpha, 1));
+	}
 }

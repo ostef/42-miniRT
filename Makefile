@@ -7,7 +7,8 @@ SRC_FILES = main.c objects.c camera.c edit_mode.c raycast.c transform.c\
 	intersection/sphere.c intersection/cylinder.c intersection/plane.c intersection/object.c\
 	render/clear_frame.c render/render_pixel.c\
 	draw/draw_pixel.c draw/draw_rect.c draw/draw_circle.c\
-	color_picker.c
+	color_picker.c\
+	ui_utils/is_inside.c
 OBJ_DIR = obj
 INCLUDE_DIRS = libft ft_math parsing .
 LIB_DIRS = libft ft_math
