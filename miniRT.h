@@ -122,7 +122,8 @@ typedef struct s_color_picker
 typedef enum e_ui_id
 {
 	UI_NONE = 0,
-	UI_COLOR_RING
+	UI_COLOR_RING,
+	UI_COLOR_ALPHA
 }	t_ui_id;
 
 typedef struct s_rt
@@ -198,10 +199,16 @@ void		render_pixel(t_rt *rt, t_int px_x, t_int px_y);
 t_vec4f		update_color_picker(t_rt *rt, t_vec4f color, t_bool has_alpha);
 void		draw_color_picker(t_rt *rt);
 
+/* UI Utils */
+
+t_bool	point_is_inside_circle(t_vec2f pt, t_vec2f center, t_f32 radius);
+t_bool	point_is_inside_ring(t_vec2f pt, t_vec2f center, t_vec2f radius);
+t_bool	point_is_inside_rect(t_vec2f p, t_rectf r);
+
 /* 2D Drawing functions (used for UI elements) */
 
 void	draw_pixel(t_rt *rt, int x, int y, t_vec4f color);
-void	draw_rect(t_rt *rt, t_vec2f min, t_vec2f max, t_vec4f color);
+void	draw_rect(t_rt *rt, t_rectf r, t_vec4f color);
 void	draw_circle(t_rt *rt, t_vec2f center, t_f32 radius, t_vec4f color);
 void	draw_ring(t_rt *rt, t_vec2f center, t_vec2f radius, t_vec4f color);
 

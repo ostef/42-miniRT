@@ -12,16 +12,16 @@
 
 #include "miniRT.h"
 
-void	draw_rect(t_rt *rt, t_vec2f min, t_vec2f max, t_vec4f color)
+void	draw_rect(t_rt *rt, t_rectf r, t_vec4f color)
 {
 	int	x;
 	int	y;
 
-	y = ft_max ((int)min.y, 0);
-	while (y <= (int)max.y && y < rt->win.frame_height)
+	y = ft_max ((int)r.y, 0);
+	while (y <= (int)(r.y + r.h) && y < rt->win.frame_height)
 	{
-		x = ft_max ((int)min.x, 0);
-		while (x <= (int)max.x && x < rt->win.frame_width)
+		x = ft_max ((int)r.x, 0);
+		while (x <= (int)(r.x + r.w) && x < rt->win.frame_width)
 		{
 			draw_pixel (rt, x, y, color);
 			x += 1;
