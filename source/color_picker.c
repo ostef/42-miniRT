@@ -159,7 +159,7 @@ void	draw_color_picker(t_rt *rt)
 		alpha_rect = ft_rectf (rect.x + 10, rect.y + rect.h, rect.w - 20, rect.h * 0.07f);
 		rect.h += alpha_rect.h + 10;
 		alpha = rt->color_picker.color.a;
-		alpha_knob_rect = ft_rectf (alpha_rect.x + alpha_rect.w * alpha, alpha_rect.y, alpha_rect.w * 0.03f, alpha_rect.h);
+		alpha_knob_rect = ft_rectf (alpha_rect.x + alpha_rect.w * alpha, alpha_rect.y, alpha_rect.w * 0.04f, alpha_rect.h);
 	}
 
 	draw_rect (rt, rect, ft_vec4f (0.2, 0.2, 0.2, 0.8));
