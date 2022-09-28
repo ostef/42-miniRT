@@ -123,6 +123,7 @@ typedef enum e_ui_id
 {
 	UI_NONE = 0,
 	UI_COLOR_RING,
+	UI_COLOR_TRIANGLE,
 	UI_COLOR_ALPHA
 }	t_ui_id;
 
@@ -204,6 +205,7 @@ void		draw_color_picker(t_rt *rt);
 t_bool	point_is_inside_circle(t_vec2f pt, t_vec2f center, t_f32 radius);
 t_bool	point_is_inside_ring(t_vec2f pt, t_vec2f center, t_vec2f radius);
 t_bool	point_is_inside_rect(t_vec2f p, t_rectf r);
+t_bool	point_is_inside_triangle(t_vec2f p, t_vec2f t0, t_vec2f t1, t_vec2f t2);
 
 /* 2D Drawing functions (used for UI elements) */
 
