@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 15:33:55 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 18:33:18 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/09/28 14:50:53 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,8 @@ void	parsing_the_return(t_str filename, t_rt *output, t_alloc arena)
 	{
 		code = parse_line(ft_dup_split_str(content_splited[i], arena),
 				output, arena);
-		ft_error(code, i + 1);
+		// ft_count_chars(file_content, '\n', content_splited[i].data - file_content);
+		ft_error(code, ft_count_chars(file_content, '\n', content_splited[i].data - file_content) + 1);
 		i++;
 	}
 }
