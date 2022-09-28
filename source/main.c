@@ -46,7 +46,11 @@ int	main(int ac, char **av)
 	t_rt	rt;
 
 	if (ac < 2 || ac > 3)
+	{
+		ft_fprintln (STDERR, "Error");
+		ft_fprintln (STDERR, "Start the program with a file as argument");
 		return (1);
+	}
 	ft_memset (&rt, 0, sizeof (rt));
 	rt = parsing(av[1]);
 	if (!create_window (&rt.win, "miniRT", 640, 480))
