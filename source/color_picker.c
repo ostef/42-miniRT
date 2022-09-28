@@ -70,12 +70,14 @@ t_vec4f	update_color_picker(t_rt *rt, t_vec4f color, t_bool has_alpha)
 	rect = ft_rectf (10, 10,
 		rt->win.frame_width * SCREEN_X_PERCENT,
 		rt->win.frame_width * SCREEN_X_PERCENT);
-	if (has_alpha)
-		rect.h += 15;
 	center = ft_vec2f_add (rect.pos, ft_vec2f (rect.w * 0.5f, rect.w * 0.5f));
 	radius.y = rect.w * 0.5f - 10;
 	radius.x = radius.y * RING_INNER_RADIUS_PERCENT;
-	alpha_rect = ft_rectf (rect.x + 10, rect.y + rect.h - 15, rect.w - 20, 10);
+	if (has_alpha)
+	{
+		alpha_rect = ft_rectf (rect.x + 10, rect.y + rect.h, rect.w - 20, rect.h * 0.05f);
+		rect.h += alpha_rect.h + 10;
+	}
 
 	rt->color_picker.opened = TRUE;
 	rt->color_picker.has_alpha = has_alpha;
@@ -149,14 +151,16 @@ void	draw_color_picker(t_rt *rt)
 	rect = ft_rectf (10, 10,
 		rt->win.frame_width * SCREEN_X_PERCENT,
 		rt->win.frame_width * SCREEN_X_PERCENT);
-	if (rt->color_picker.has_alpha)
-		rect.h += 15;
 	center = ft_vec2f_add (rect.pos, ft_vec2f (rect.w * 0.5f, rect.w * 0.5f));
 	radius.y = rect.w * 0.5f - 10;
 	radius.x = radius.y * RING_INNER_RADIUS_PERCENT;
-	alpha_rect = ft_rectf (rect.x + 10, rect.y + rect.h - 15, rect.w - 20, 10);
-	alpha = rt->color_picker.color.a;
-	alpha_knob_rect = ft_rectf (alpha_rect.x + alpha_rect.w * alpha, alpha_rect.y, 5, 10);
+	if (rt->color_picker.has_alpha)
+	{
+		alpha_rect = ft_rectf (rect.x + 10, rect.y + rect.h, rect.w - 20, rect.h * 0.07f);
+		rect.h += alpha_rect.h + 10;
+		alpha = rt->color_picker.color.a;
+		alpha_knob_rect = ft_rectf (alpha_rect.x + alpha_rect.w * alpha, alpha_rect.y, alpha_rect.w * 0.03f, alpha_rect.h);
+	}
 
 	draw_rect (rt, rect, ft_vec4f (0.2, 0.2, 0.2, 0.8));
 	draw_hsv_ring (rt, center, radius);
