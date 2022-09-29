@@ -80,14 +80,6 @@ void	edit_mode_update(t_rt *rt)
 	}
 	if (rt->selected_object)
 	{
-		if (is_key_pressed (&rt->win, KEY_MINUS))
-		{
-			remove_object (rt, rt->selected_object - rt->objs);
-			if (rt->selected_object >= rt->objs + rt->obj_count)
-				rt->selected_object -= 1;;
-			if (rt->selected_object < rt->objs)
-				rt->selected_object = NULL;
-		}
 		if (is_key_pressed (&rt->win, KEY_T))
 			change_object_type (rt->selected_object);
 		t_vec3f	translation = ft_vec3f (
@@ -105,5 +97,13 @@ void	edit_mode_update(t_rt *rt)
 			is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT),
 			is_key_down (&rt->win, KEY_UP) - is_key_down (&rt->win, KEY_DOWN)
 		));
+		if (is_key_pressed (&rt->win, KEY_MINUS))
+		{
+			remove_object (rt, rt->selected_object - rt->objs);
+			if (rt->selected_object >= rt->objs + rt->obj_count)
+				rt->selected_object -= 1;;
+			if (rt->selected_object < rt->objs)
+				rt->selected_object = NULL;
+		}
 	}
 }
