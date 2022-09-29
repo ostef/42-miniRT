@@ -192,26 +192,39 @@ t_bool		ray_plane_intersection(t_ray ray, t_plane pla, t_hit_res *res);
 t_bool		ray_object_intersection(t_ray ray, t_object *obj, t_hit_res *res);
 
 t_hit_res	raycast_first(t_rt *rt, t_ray ray, t_filter fil);
-t_hit_res	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore, t_filter fil);
+t_hit_res	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore,
+				t_filter fil);
 t_hit_res	raycast_closest(t_rt *rt, t_ray ray, t_filter fil);
-t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore, t_filter fil);
+t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore,
+				t_filter fil);
 void		render_pixel(t_rt *rt, t_int px, t_int py);
+
+/* Color picker */
+
+# define COLOR_PICKER_SCREEN_X_PERCENT 0.25f
+# define COLOR_PICKER_RING_INNER_RADIUS_PERCENT 0.7f
+
+t_vec3f		hsv_to_rgb(t_vec3f hsv);
+t_vec3f		rgb_to_hsv(t_vec3f rgb);
+t_vec2f		sv_from_triangle_point(t_vec2f p);
+t_vec2f		triangle_point_from_sv(t_vec2f sv);
 
 t_vec4f		update_color_picker(t_rt *rt, t_vec4f color, t_bool has_alpha);
 void		draw_color_picker(t_rt *rt);
 
 /* UI Utils */
 
-t_bool	point_is_inside_circle(t_vec2f pt, t_vec2f center, t_f32 radius);
-t_bool	point_is_inside_ring(t_vec2f pt, t_vec2f center, t_vec2f radius);
-t_bool	point_is_inside_rect(t_vec2f p, t_rectf r);
-t_bool	point_is_inside_triangle(t_vec2f p, t_vec2f t0, t_vec2f t1, t_vec2f t2);
+t_bool		point_is_inside_circle(t_vec2f pt, t_vec2f center, t_f32 radius);
+t_bool		point_is_inside_ring(t_vec2f pt, t_vec2f center, t_vec2f radius);
+t_bool		point_is_inside_rect(t_vec2f p, t_rectf r);
+t_bool		point_is_inside_triangle(t_vec2f p, t_vec2f t0, t_vec2f t1,
+				t_vec2f t2);
 
 /* 2D Drawing functions (used for UI elements) */
 
-void	draw_pixel(t_rt *rt, int x, int y, t_vec4f color);
-void	draw_rect(t_rt *rt, t_rectf r, t_vec4f color);
-void	draw_circle(t_rt *rt, t_vec2f center, t_f32 radius, t_vec4f color);
-void	draw_ring(t_rt *rt, t_vec2f center, t_vec2f radius, t_vec4f color);
+void		draw_pixel(t_rt *rt, int x, int y, t_vec4f color);
+void		draw_rect(t_rt *rt, t_rectf r, t_vec4f color);
+void		draw_circle(t_rt *rt, t_vec2f center, t_f32 radius, t_vec4f color);
+void		draw_ring(t_rt *rt, t_vec2f center, t_vec2f radius, t_vec4f color);
 
 #endif
