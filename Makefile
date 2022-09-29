@@ -34,7 +34,8 @@ OBJ_FILES = $(SRC_FILES:.c=.obj)
 BONUS_OBJ_FILES = $(BONUS_SRC_FILES:.c=.obj)
 LIB_FILES = libft/libft.lib ft_math/libft_math.lib User32.lib Gdi32.lib
 CC = cl
-C_FLAGS = $(addprefix -I,$(INCLUDE_DIRS)) -TC -nologo -O2
+C_FLAGS = $(addprefix -I,$(INCLUDE_DIRS)) -TC -nologo -O2 #-Z7
+LINK_FLAGS = #-Z7
 DEPENDENCIES = miniRT.h libft/libft.lib ft_math/libft_math.lib Makefile
 
 else
@@ -60,12 +61,12 @@ $(OBJ_DIR)/%.obj: $(SRC_DIR)/%.c $(DEPENDENCIES)
 	@$(CC) $(C_FLAGS) -c $< -Fo$(dir $@)
 
 $(NAME): $(addprefix $(OBJ_DIR)/, $(OBJ_FILES))
-	cl -nologo -Fe$(NAME) $? $(LIB_FILES)
+	@$(CC) $(LINK_FLAGS) -nologo -Fe$(NAME) $? $(LIB_FILES)
 
 bonus: libft ft_math bonus_exe
 
 bonus_exe: $(addprefix $(OBJ_DIR)/, $(BONUS_OBJ_FILES))
-	cl -nologo -Fe$(NAME) $? $(LIB_FILES)
+	@$(CC) $(LINK_FLAGS) -nologo -Fe$(NAME) $? $(LIB_FILES)
 
 else
 
