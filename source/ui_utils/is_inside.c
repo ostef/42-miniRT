@@ -6,7 +6,7 @@
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/28 13:08:06 by soumanso          #+#    #+#             */
-/*   Updated: 2022/09/28 14:20:30 by soumanso         ###   ########lyon.fr   */
+/*   Updated: 2022/09/29 14:00:56 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,7 @@ t_bool	point_is_inside_triangle(t_vec2f p, t_vec2f t0, t_vec2f t1, t_vec2f t2)
 	d.x = _sign (p, t0, t1);
 	d.y = _sign (p, t1, t2);
 	d.z = _sign (p, t2, t0);
-	has_neg = (d.x < 0) || (d.y < 0) || (d.z < 0);
-	has_pos = (d.x > 0) || (d.y > 0) || (d.z > 0);
+	has_neg = (d.x < 0 || d.y < 0 || d.z < 0);
+	has_pos = (d.x > 0 || d.y > 0 || d.z > 0);
 	return (!(has_neg && has_pos));
 }
-
