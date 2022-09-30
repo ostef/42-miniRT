@@ -97,6 +97,7 @@ typedef struct s_ray
 {
 	t_vec3f	origin;
 	t_vec3f	dir;
+	t_f32	length;
 }	t_ray;
 
 typedef struct s_camera
@@ -192,11 +193,7 @@ t_bool		ray_plane_intersection(t_ray ray, t_plane pla, t_hit_res *res);
 t_bool		ray_object_intersection(t_ray ray, t_object *obj, t_hit_res *res);
 
 t_hit_res	raycast_first(t_rt *rt, t_ray ray, t_filter fil);
-t_hit_res	raycast_first_except(t_rt *rt, t_ray ray, t_object *ignore,
-				t_filter fil);
 t_hit_res	raycast_closest(t_rt *rt, t_ray ray, t_filter fil);
-t_hit_res	raycast_closest_except(t_rt *rt, t_ray ray, t_object *ignore,
-				t_filter fil);
 void		render_pixel(t_rt *rt, t_int px, t_int py);
 
 /* Color picker */

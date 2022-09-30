@@ -94,21 +94,27 @@ void	draw_color_picker(t_rt *rt)
 	radius.x = radius.y * COLOR_PICKER_RING_INNER_RADIUS_PERCENT;
 	if (rt->color_picker.has_alpha)
 	{
-		alpha_rect = ft_rectf (rect.x + 10, rect.y + rect.h, rect.w - 20, rect.h * 0.07f);
+		alpha_rect = ft_rectf (rect.x + 10, rect.y + rect.h,
+			rect.w - 20, rect.h * 0.07f);
 		rect.h += alpha_rect.h + 10;
 		alpha = rt->color_picker.color.a;
-		alpha_knob_rect = ft_rectf (alpha_rect.x + alpha_rect.w * alpha, alpha_rect.y, alpha_rect.w * 0.04f, alpha_rect.h);
+		alpha_knob_rect = ft_rectf (alpha_rect.x + alpha_rect.w * alpha,
+			alpha_rect.y, alpha_rect.w * 0.04f, alpha_rect.h);
 	}
 
 	draw_rect (rt, rect, ft_vec4f (0.2, 0.2, 0.2, 0.8));
 	draw_hsv_ring (rt, center, radius);
 	t_vec3f	hsv = rgb_to_hsv (rt->color_picker.color.rgb);
-	t_vec2f	ring_point = ft_vec2f (cosf (hsv.x * PI / 180), sinf (hsv.x * PI / 180));
+	t_vec2f	ring_point = ft_vec2f (cosf (hsv.x * PI / 180),
+		sinf (hsv.x * PI / 180));
 	ring_point = ft_vec2f_mulf (ring_point, (radius.x + radius.y) * 0.5f);
 	ring_point = ft_vec2f_add (center, ring_point);
 	draw_ring (rt, ring_point, ft_vec2f (10, 11), ft_vec4f (1, 1, 1, 1));
-	draw_saturation_value_triangle (rt, center, radius.x, rt->color_picker.color.rgb);
-	draw_ring (rt, ft_vec2f_add (center, ft_vec2f_mulf (triangle_point_from_sv (hsv.yz), radius.x)), ft_vec2f (10, 11), ft_vec4f (1, 1, 1, 1));
+	draw_saturation_value_triangle (rt, center, radius.x,
+		rt->color_picker.color.rgb);
+	draw_ring (rt, ft_vec2f_add (center,
+		ft_vec2f_mulf (triangle_point_from_sv (hsv.yz), radius.x)),
+		ft_vec2f (10, 11), ft_vec4f (1, 1, 1, 1));
 	if (rt->color_picker.has_alpha)
 	{
 		draw_rect (rt, alpha_rect, ft_vec4f (0.3, 0.3, 0.3, 0.5));

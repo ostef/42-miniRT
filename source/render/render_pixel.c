@@ -38,11 +38,11 @@ static t_vec4f	calc_diffuse_for_light(t_rt *rt, t_hit_res hit, t_object obj)
 	t_vec4f		diffuse;
 
 	pt_to_light = ft_vec3f_direction (hit.point, obj.light.pos);
-	ray.origin = hit.point;
+	ray.origin = ft_vec3f_add (hit.point, ft_vec3f_mulf (hit.normal, 0.001f));
 	ray.dir = pt_to_light;
-	sh = raycast_closest_except (rt, ray, hit.object, FIL_SHAPES);
-	if (sh.hit
-		&& sh.dist * sh.dist < ft_vec3f_sqrd_dist (obj.light.pos, hit.point))
+	ray.length = ft_vec3f_dist (hit.point, obj.light.pos);
+	sh = raycast_first (rt, ray, FIL_SHAPES);
+	if (sh.hit)
 		diffuse.w = 0;
 	else
 		diffuse.w = ft_maxf (ft_vec3f_dot (hit.normal, pt_to_light), 0);

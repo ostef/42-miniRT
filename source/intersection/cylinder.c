@@ -57,10 +57,12 @@ static t_bool	ray_cylinder_body_intersection(t_ray ray, t_cylinder cyl,
 	t_dat *dat, t_hit_res *res)
 {
 	dat->y = dat->up_on_bot_to_ori + dat->t * dat->dir_on_cyl;
-	if (dat->t >= 0 && dat->y > 0 && dat->y < dat->sqrd_height)
+	if (dat->t >= 0 && dat->t < ray.length 
+		&& dat->y > 0 && dat->y < dat->sqrd_height)
 	{
 		if (res)
 		{
+			res->hit = TRUE;
 			res->dist = dat->t;
 			res->normal = ft_vec3f_mulf (ft_vec3f_sub (
 						ft_vec3f_add (
@@ -74,7 +76,6 @@ static t_bool	ray_cylinder_body_intersection(t_ray ray, t_cylinder cyl,
 					ray.origin,
 					ft_vec3f_mulf (ray.dir, dat->t)
 					);
-			res->hit = TRUE;
 		}
 		return (TRUE);
 	}
@@ -88,7 +89,8 @@ static t_bool	ray_cylinder_caps_intersection(t_ray ray, t_dat *dat,
 		dat->t = -dat->up_on_bot_to_ori / dat->dir_on_cyl;
 	else
 		dat->t = (dat->sqrd_height - dat->up_on_bot_to_ori) / dat->dir_on_cyl;
-	if (dat->t >= 0 && ft_absf (dat->k1 + dat->k2 * dat->t) < dat->h)
+	if (dat->t >= 0 && dat->t < ray.length
+		&& ft_absf (dat->k1 + dat->k2 * dat->t) < dat->h)
 	{
 		if (res)
 		{

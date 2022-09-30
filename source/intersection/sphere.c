@@ -39,7 +39,7 @@ t_bool	ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_res *res)
 		d[1] = tca - (ft_signf (tca)) * thc;
 	if (res)
 	{
-		res->hit = d[1] >= 0;
+		res->hit = d[1] >= 0 && d[1] < ray.length;
 		if (res->hit)
 		{
 			res->point = ft_vec3f_add(ray.origin, ft_vec3f_mulf(ray.dir, d[1]));
@@ -50,5 +50,5 @@ t_bool	ray_sphere_intersection(t_ray ray, t_sphere sph, t_hit_res *res)
 			res->dist = d[1];
 		}
 	}
-	return (d[1] >= 0);
+	return (d[1] >= 0 && d[1] < ray.length);
 }

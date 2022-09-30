@@ -26,6 +26,7 @@ t_ray	ray_from_screen_point(t_rt *rt, t_vec2f point, t_bool invert_y)
 	ray.dir.z = 1;
 	ray.dir = ft_vec3f_normalized (ray.dir);
 	ray.dir = ft_mat4f_transform_vector (rt->camera.transform, ray.dir);
+	ray.length = INFINITY;
 	return (ray);
 }
 
