@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 14:03:52 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 18:10:37 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/10/03 14:16:02 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@ typedef enum e_error {
 	ERR_NO_FILENAME,
 	ERR_FILENAME,
 	ERR_FILE_CONTENT,
+	ERR_NO_CAMERA,
+	ERR_NO_AMBIENT,
+	ERR_NO_LIGHT,
 	ERR_FORMAT,
 	ERR_IDENTIFIER,
 	ERR_RANGE_DIRECTION,
