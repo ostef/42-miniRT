@@ -22,20 +22,16 @@ t_bool	ray_plane_intersection(t_ray ray, t_plane pla, t_hit_res *res)
 	{
 		t = ft_vec3f_dot (ft_vec3f_sub (pla.origin, ray.origin), pla.normal)
 			/ denom;
-		if (res)
+		res->hit = (t > 0.0001f && t < ray.length);
+		if (res->hit)
 		{
-			res->hit = t > 0.0001f && t < ray.length;
-			if (res->hit)
-			{
-				res->dist = t;
-				res->point = ft_vec3f_add (ray.origin,
-						ft_vec3f_mulf (ray.dir, res->dist));
-				res->normal = ft_vec3f_mulf (pla.normal, -ft_signf (denom));
-			}
+			res->dist = t;
+			res->point = ft_vec3f_add (ray.origin,
+					ft_vec3f_mulf (ray.dir, res->dist));
+			res->normal = ft_vec3f_mulf (pla.normal, -ft_signf (denom));
 		}
 		return (t > 0.0001f && t < ray.length);
 	}
-	if (res)
-		res->hit = FALSE;
+	res->hit = FALSE;
 	return (FALSE);
 }
