@@ -29,7 +29,20 @@ t_ray	ray_from_screen_point(t_rt *rt, t_vec2f point, t_bool invert_y)
 	return (ray);
 }
 
-void update_camera_movement(t_rt *rt)
+static t_vec3f	get_input_vec(t_window *win)
+{
+	t_vec3f	input;
+
+	input.x = is_key_down (win, KEY_D) - is_key_down (win, KEY_A);
+	input.y = is_key_down (win, KEY_E) - is_key_down (win, KEY_Q);
+	input.z = is_key_down (win, KEY_W) - is_key_down (win, KEY_S);
+	input = ft_vec3f_normalized (input);
+	if (is_key_down (win, KEY_SHIFT))
+		input = ft_vec3f_mulf (input, 10);
+	return (input);
+}
+
+void	update_camera_movement(t_rt *rt)
 {
 	t_vec3f	right;
 	t_vec3f	up;
@@ -39,18 +52,20 @@ void update_camera_movement(t_rt *rt)
 	right = ft_mat4f_right_vector (rt->camera.transform);
 	up = ft_mat4f_up_vector (rt->camera.transform);
 	forward = ft_mat4f_forward_vector (rt->camera.transform);
-	rt->camera.yaw += (is_key_down (&rt->win, KEY_RIGHT) - is_key_down (&rt->win, KEY_LEFT)) * 2;
-	rt->camera.pitch += (is_key_down (&rt->win, KEY_UP) - is_key_down (&rt->win, KEY_DOWN)) * 2;
+	rt->camera.yaw += (is_key_down (&rt->win, KEY_RIGHT)
+			- is_key_down (&rt->win, KEY_LEFT)) * 2;
+	rt->camera.pitch += (is_key_down (&rt->win, KEY_UP)
+			- is_key_down (&rt->win, KEY_DOWN)) * 2;
 	rt->camera.pitch = ft_clampf (rt->camera.pitch, -80, 80);
-	input.x = is_key_down (&rt->win, KEY_D) - is_key_down (&rt->win, KEY_A);
-	input.y = is_key_down (&rt->win, KEY_E) - is_key_down (&rt->win, KEY_Q);
-	input.z = is_key_down (&rt->win, KEY_W) - is_key_down (&rt->win, KEY_S);
-	input = ft_vec3f_normalized (input);
-	if (is_key_down (&rt->win, KEY_SHIFT))
-		input = ft_vec3f_mulf (input, 10);
-	rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (right, input.x));
-	rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (up, input.y));
-	rt->camera.position = ft_vec3f_add (rt->camera.position, ft_vec3f_mulf (forward, input.z));
-	rt->camera.transform = ft_mat4f_rotate_euler (ft_vec3f (rt->camera.yaw * PI / 180.0f, rt->camera.pitch * PI / 180.0f, 0));
-	rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate (rt->camera.position), rt->camera.transform);
+	input = get_input_vec(&rt->win);
+	rt->camera.position = ft_vec3f_add (rt->camera.position,
+			ft_vec3f_mulf (right, input.x));
+	rt->camera.position = ft_vec3f_add (rt->camera.position,
+			ft_vec3f_mulf (up, input.y));
+	rt->camera.position = ft_vec3f_add (rt->camera.position,
+			ft_vec3f_mulf (forward, input.z));
+	rt->camera.transform = ft_mat4f_rotate_euler (ft_vec3f
+			(rt->camera.yaw * PI / 180.0f, rt->camera.pitch * PI / 180.0f, 0));
+	rt->camera.transform = ft_mat4f_mul (ft_mat4f_translate
+			(rt->camera.position), rt->camera.transform);
 }
