@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/26 17:19:42 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 18:34:44 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/10/03 14:10:53 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 t_error	parse_camera(t_pcstr *split, t_camera *cam, t_alloc ar)
 {
+	static t_bool	first = TRUE;
 	t_vec3f			direction;
 	t_error			code;
-	static t_bool	first = TRUE;
 
 	if (!first)
 		return (ERR_DOUBLE_CAMERA);
@@ -42,8 +42,8 @@ t_error	parse_camera(t_pcstr *split, t_camera *cam, t_alloc ar)
 
 t_error	parse_ambient_light(t_pcstr *split, t_vec4f *light, t_alloc arena)
 {
-	t_error			code;
 	static t_bool	first = TRUE;
+	t_error			code;
 
 	if (!first)
 		return (ERR_DOUBLE_AMBIENT_LIGHT);

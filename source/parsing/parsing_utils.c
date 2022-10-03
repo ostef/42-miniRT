@@ -6,7 +6,7 @@
 /*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 14:06:29 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 18:04:13 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/10/03 14:23:33 by ljourand         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,9 @@ t_str	ft_dup_split_str(t_pcstr split_str, t_alloc arena)
 
 static void	ft_error_2(t_error code)
 {
-	if (code == ERR_RANGE_COLOR)
+	if (code == ERR_RANGE_DIRECTION)
+		ft_fprintln(STDERR, "The direction should have value between -1 and 1");
+	else if (code == ERR_RANGE_COLOR)
 		ft_fprintln(STDERR, "The color should have values between 0 and 255");
 	else if (code == ERR_RANGE_BRIGHTNESS)
 		ft_fprintln(STDERR, "The brightness should be a value between 0 and 1");
@@ -52,12 +54,16 @@ void	ft_error(t_error code, t_uint nb_line)
 		ft_fprintln(STDERR, "The filename should have a .rt extension");
 	else if (code == ERR_FILE_CONTENT)
 		ft_fprintln(STDERR, "Problem while reading file");
+	else if (code == ERR_NO_CAMERA)
+		ft_fprintln(STDERR, "There should be a camera");
+	else if (code == ERR_NO_AMBIENT)
+		ft_fprintln(STDERR, "There should be an ambient light");
+	else if (code == ERR_NO_LIGHT)
+		ft_fprintln(STDERR, "There should be a light");
 	else if (code == ERR_IDENTIFIER)
 		ft_fprintln(STDERR, "Unknown identifier");
 	else if (code == ERR_FORMAT)
 		ft_fprintln(STDERR, "Wrong format");
-	else if (code == ERR_RANGE_DIRECTION)
-		ft_fprintln(STDERR, "The direction should have value between -1 and 1");
 	ft_error_2(code);
 	if (nb_line)
 		ft_fprintln(STDERR, "on line: %d", nb_line);
