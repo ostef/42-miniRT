@@ -24,7 +24,7 @@ t_bool	ray_plane_intersection(t_ray ray, t_plane pla, t_hit_res *res)
 			/ denom;
 		if (res)
 		{
-			res->hit = t > 0.0001f;
+			res->hit = t > 0.0001f && t < ray.length;
 			if (res->hit)
 			{
 				res->dist = t;
@@ -33,7 +33,7 @@ t_bool	ray_plane_intersection(t_ray ray, t_plane pla, t_hit_res *res)
 				res->normal = ft_vec3f_mulf (pla.normal, -ft_signf (denom));
 			}
 		}
-		return (t > 0.0001f);
+		return (t > 0.0001f && t < ray.length);
 	}
 	if (res)
 		res->hit = FALSE;

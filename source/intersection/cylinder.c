@@ -1,120 +1,143 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ray_cylinder.c                                     :+:      :+:    :+:   */
+/*   cylinder2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/24 14:18:39 by soumanso          #+#    #+#             */
-/*   Updated: 2022/09/24 14:18:39 by soumanso         ###   ########lyon.fr   */
+/*   Created: 2022/09/30 19:24:56 by soumanso          #+#    #+#             */
+/*   Updated: 2022/09/30 19:24:56 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "miniRT.h"
 
-typedef struct s_dat
+static t_hit_res	ray_disk_intersection(t_ray ray, t_plane pla, t_f32 rad)
 {
-	t_vec3f	bot_to_top;
-	t_vec3f	bot_to_ori;
-	t_f32	sqrd_height;
-	t_f32	dir_on_cyl;
-	t_f32	up_on_bot_to_ori;
-	t_f32	k0;
-	t_f32	k1;
-	t_f32	k2;
-	t_f32	h;
-	t_f32	t;
-	t_f32	y;
-}	t_dat;
+	t_hit_res	res;
 
-static t_bool	ray_cylinder_init(t_ray ray, t_cylinder cyl,
-	t_dat *dat, t_hit_res *res)
-{
-	dat->bot_to_top = ft_vec3f_sub (cyl.top, cyl.bottom);
-	dat->bot_to_ori = ft_vec3f_sub (ray.origin, cyl.bottom);
-	dat->sqrd_height = ft_vec3f_dot (dat->bot_to_top, dat->bot_to_top);
-	dat->dir_on_cyl = ft_vec3f_dot (dat->bot_to_top, ray.dir);
-	dat->up_on_bot_to_ori = ft_vec3f_dot (dat->bot_to_top, dat->bot_to_ori);
-	dat->k0 = dat->sqrd_height * ft_vec3f_sqrd_len (dat->bot_to_ori)
-		- dat->up_on_bot_to_ori * dat->up_on_bot_to_ori
-		- cyl.radius * cyl.radius * dat->sqrd_height;
-	dat->k1 = dat->sqrd_height * ft_vec3f_dot (dat->bot_to_ori, ray.dir)
-		- dat->up_on_bot_to_ori * dat->dir_on_cyl;
-	dat->k2 = dat->sqrd_height - dat->dir_on_cyl * dat->dir_on_cyl;
-	dat->h = dat->k1 * dat->k1 - dat->k2 * dat->k0;
-	if (dat->h < 0)
+	if (!ray_plane_intersection (ray, pla, &res))
+		return (res);
+	if (ft_vec3f_sqrd_dist (res.point, pla.origin) >= rad * rad)
 	{
-		if (res)
-			res->hit = FALSE;
-		return (FALSE);
+		res.hit = FALSE;
+		return (res);
 	}
-	dat->h = sqrtf (dat->h);
-	dat->t = (-dat->k1 - dat->h) / dat->k2;
-	return (TRUE);
+	return (res);
 }
 
-static t_bool	ray_cylinder_body_intersection(t_ray ray, t_cylinder cyl,
-	t_dat *dat, t_hit_res *res)
-{
-	dat->y = dat->up_on_bot_to_ori + dat->t * dat->dir_on_cyl;
-	if (dat->t >= 0 && dat->y > 0 && dat->y < dat->sqrd_height)
-	{
-		if (res)
-		{
-			res->dist = dat->t;
-			res->normal = ft_vec3f_mulf (ft_vec3f_sub (
-						ft_vec3f_add (
-							dat->bot_to_ori,
-							ft_vec3f_mulf (ray.dir, dat->t)),
-						ft_vec3f_mulf (
-							dat->bot_to_top,
-							dat->y / dat->sqrd_height)),
-					1 / cyl.radius);
-			res->point = ft_vec3f_add (
-					ray.origin,
-					ft_vec3f_mulf (ray.dir, dat->t)
-					);
-			res->hit = TRUE;
-		}
-		return (TRUE);
-	}
-	return (FALSE);
-}
+/*
+	http://pastebin.com/2XrrNcxb
+	https://gist.github.com/jdryg/ecde24d34aa0ce2d4d87
 
-static t_bool	ray_cylinder_caps_intersection(t_ray ray, t_dat *dat,
-	t_hit_res *res)
-{
-	if (dat->y < 0)
-		dat->t = -dat->up_on_bot_to_ori / dat->dir_on_cyl;
-	else
-		dat->t = (dat->sqrd_height - dat->up_on_bot_to_ori) / dat->dir_on_cyl;
-	if (dat->t >= 0 && ft_absf (dat->k1 + dat->k2 * dat->t) < dat->h)
-	{
-		if (res)
-		{
-			res->dist = dat->t;
-			res->normal = ft_vec3f_mulf (
-					ft_vec3f_normalized (dat->bot_to_top), ft_signf (dat->y));
-			res->point = ft_vec3f_add (ray.origin,
-					ft_vec3f_mulf (ray.dir, dat->t));
-			res->hit = TRUE;
-		}
-		return (TRUE);
-	}
-	return (FALSE);
-}
+Substituting equ. (1) - (6) to equ. (I) and solving for t' gives:
+	t' = (t * dot(AB, d) + dot(AB, AO)) / dot(AB, AB); (7) or
+	t' = t * m + n where 
+	m = dot(AB, d) / dot(AB, AB) and 
+	n = dot(AB, AO) / dot(AB, AB)
 
+Substituting (7) into (II) and solving for t gives:
+	
+	dot(Q, Q)*t^2 + 2*dot(Q, R)*t + (dot(R, R) - r^2) = 0
+	where
+	Q = d - AB * m
+	R = AO - AB * n
+*/
 t_bool	ray_cylinder_intersection(t_ray ray, t_cylinder cyl, t_hit_res *res)
 {
-	t_dat	dat;
+	t_vec3f	ab = ft_vec3f_sub (cyl.top, cyl.bottom);
+	t_vec3f	ao = ft_vec3f_sub (ray.origin, cyl.bottom);
 
-	if (!ray_cylinder_init (ray, cyl, &dat, res))
-		return (FALSE);
-	if (ray_cylinder_body_intersection (ray, cyl, &dat, res))
-		return (TRUE);
-	if (ray_cylinder_caps_intersection (ray, &dat, res))
-		return (TRUE);
-	if (res)
+	t_f32	ab_dot_d = ft_vec3f_dot (ab, ray.dir);
+	t_f32	ab_dot_ao = ft_vec3f_dot (ab, ao);
+	t_f32	ab_dot_ab = ft_vec3f_dot (ab, ab);
+
+	t_f32	m = ab_dot_d / ab_dot_ab;
+	t_f32	n = ab_dot_ao / ab_dot_ab;
+
+	t_vec3f	q = ft_vec3f_sub (ray.dir, ft_vec3f_mulf (ab, m));
+	t_vec3f	r = ft_vec3f_sub (ao, ft_vec3f_mulf (ab, n));
+
+	t_f32	a = ft_vec3f_dot (q, q);
+	t_f32	b = 2 * ft_vec3f_dot (q, r);
+	t_f32	c = ft_vec3f_dot (r, r) - (cyl.radius * cyl.radius);
+
+	if (a == 0)
+	{
+
+		t_plane	bot;
+		bot.origin = cyl.bottom;
+		bot.normal = ft_vec3f_normalized (ft_vec3f_neg (ab));
+		*res = ray_disk_intersection (ray, bot, cyl.radius);
+
+		t_plane	top;
+		top.origin = cyl.top;
+		top.normal = ft_vec3f_neg (bot.normal);
+		t_hit_res	temp_hit = ray_disk_intersection (ray, top, cyl.radius);
+
+		if (temp_hit.hit && (!res->hit || temp_hit.dist < res->dist))
+			*res = temp_hit;
+		return (res->hit);
+	}
+
+	t_f32	discr = b * b - 4 * a * c;	// Polynomial
+	if (discr < 0)
+	{
 		res->hit = FALSE;
+		return (FALSE);
+	}
+
+	t_f32	sqrt_discr = sqrtf (discr);
+	t_f32	tmin = (-b - sqrt_discr) / (2 * a);
+	t_f32	tmax = (-b + sqrt_discr) / (2 * a);
+	if (tmin > tmax)
+	{
+		t_f32	tmp = tmin;
+		tmin = tmax;
+		tmax = tmp;
+	}
+
+	t_f32	t_k1 = tmin * m + n;
+	t_f32	t_k2 = tmax * m + n;
+	t_f32	t_k = (ft_vec3f_dot (ft_vec3f_sub (ray.origin, cyl.bottom), ab) / ft_vec3f_sqrd_len (ab));
+	t_bool	is_inside = tmin < 0 && t_k >= 0 && t_k <= 1;
+	if (is_inside)
+	{
+		tmin = tmax;
+		t_k1 = t_k2;
+	}
+	if (t_k1 < 0)	// Bottom plane
+	{
+		t_plane	bot;
+		bot.origin = cyl.bottom;
+		bot.normal = ft_vec3f_normalized (ft_vec3f_neg (ab));
+		*res = ray_disk_intersection (ray, bot, cyl.radius);
+		return (res->hit);
+	}
+	else if (t_k1 > 1)	// Top plane
+	{
+		t_plane	top;
+		top.origin = cyl.top;
+		top.normal = ft_vec3f_normalized (ab);
+		*res = ray_disk_intersection (ray, top, cyl.radius);
+		return (res->hit);
+	}
+	else	// Body
+	{
+		res->hit = tmin > 0 && tmin < ray.length;
+		if (res->hit)
+		{
+			res->point = ft_vec3f_add (ray.origin, ft_vec3f_mulf (ray.dir, tmin));
+			res->dist = tmin;
+			res->normal = ft_vec3f_direction (ft_vec3f_add (cyl.bottom, ft_vec3f_mulf (ab, t_k1)), res->point);
+			if (is_inside)
+				res->normal = ft_vec3f_neg (res->normal);
+		}
+		return (res->hit);
+	}
+
+	//t_f32	t_k2 = tmax * m + n;
+	// Same as above
+	res->hit = FALSE;
 	return (FALSE);
 }
