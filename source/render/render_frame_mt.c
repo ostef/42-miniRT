@@ -65,7 +65,7 @@ void	render_frame(t_rt *rt)
 			d[y * THREADS_X + x].x = x * (rt->win.frame_width / THREADS_X);
 			d[y * THREADS_X + x].y = y * (rt->win.frame_height / THREADS_Y);
 			create_thread (&threads[y * THREADS_X + x],
-					&render_thread, &d[y * THREADS_X + x]);
+				&render_thread, &d[y * THREADS_X + x]);
 			x += 1;
 		}
 		y += 1;
