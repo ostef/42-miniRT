@@ -20,7 +20,7 @@ SRC_FILES += win32_layer/window.c win32_layer/input.c win32_layer/loop.c win32_l
 
 else
 
-SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/loop.c mlx_layer/threads.c
+SRC_FILES += mlx_layer/window.c mlx_layer/input.c mlx_layer/events.c mlx_layer/input_events.c mlx_layer/loop.c mlx_layer/threads.c
 
 endif
 
