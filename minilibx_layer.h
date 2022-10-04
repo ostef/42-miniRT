@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minilibx_layer.h                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ljourand <ljourand@student.42lyon.fr>      +#+  +:+       +#+        */
+/*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/14 13:49:37 by ljourand          #+#    #+#             */
-/*   Updated: 2022/09/26 16:07:32 by ljourand         ###   ########lyon.fr   */
+/*   Updated: 2022/10/04 16:59:32 by soumanso         ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,5 +156,11 @@ typedef struct s_window
 }	t_window;
 
 void	init_events(t_window *win);
+int		on_destroy(int keycode, void *win);
+int		on_keydown(int keycode, void *win);
+int		on_keyup(int keycode, void *win);
+int		on_mouse_press(int keycode, int x, int y, void *win);
+int		on_mouse_release(int keycode, int x, int y, void *win);
+int		on_mouse_move(int x, int y, void *win);
 
 #endif
