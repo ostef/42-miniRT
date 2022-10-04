@@ -51,19 +51,6 @@ typedef struct s_inter_data
 	t_bool	is_inside;
 }	t_inter_data;
 
-static t_bool	ray_disk_intersection(t_ray ray, t_plane pla, t_f32 rad,
-	t_hit_res *res)
-{
-	if (!ray_plane_intersection (ray, pla, res))
-		return (FALSE);
-	if (ft_vec3f_sqrd_dist (res->point, pla.origin) >= rad * rad)
-	{
-		res->hit = FALSE;
-		return (FALSE);
-	}
-	return (TRUE);
-}
-
 static t_inter_data	ray_cylinder_intersection_init(t_ray ray, t_cylinder cyl)
 {
 	t_inter_data	d;
@@ -100,7 +87,14 @@ static t_bool	ray_cylinder_caps_intersection(t_ray ray, t_cylinder cyl,
 		pla.origin = cyl.top;
 		pla.normal = ft_vec3f_normalized (d.ab);
 	}
-	return (ray_disk_intersection (ray, pla, cyl.radius, res));
+	if (!ray_plane_intersection (ray, pla, res))
+		return (FALSE);
+	if (ft_vec3f_sqrd_dist (res->point, pla.origin) > cyl.radius * cyl.radius)
+	{
+		res->hit = FALSE;
+		return (FALSE);
+	}
+	return (TRUE);
 }
 
 static t_bool	ray_cylinder_body_intersection(t_ray ray, t_cylinder cyl,

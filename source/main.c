@@ -26,7 +26,7 @@ int	tick(void *ptr)
 		rt->is_editing = !rt->is_editing;
 		rt->selected_object = NULL;
 	}
-	ft_memset (&rt->color_picker, 0, sizeof (t_color_picker));
+	ft_memset (&rt->cp, 0, sizeof (t_color_picker));
 	if (!rt->keep_ui_elem_active)
 		rt->active_ui_elem = UI_NONE;
 	rt->keep_ui_elem_active = FALSE;

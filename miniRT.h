@@ -118,6 +118,11 @@ typedef struct s_color_picker
 	t_bool	opened;
 	t_bool	has_alpha;
 	t_vec4f	color;
+	t_rectf	rect;
+	t_vec2f	ring_center;
+	t_vec2f	ring_radius;
+	t_rectf	alpha_rect;
+	t_vec2f	tri[3];
 }	t_color_picker;
 
 typedef enum e_ui_id
@@ -140,7 +145,7 @@ typedef struct s_rt
 	t_object		*selected_object;
 	t_bool			is_picking_color;
 	t_bool			ui_captured_mouse;
-	t_color_picker	color_picker;
+	t_color_picker	cp;
 	t_ui_id			active_ui_elem;
 	t_bool			keep_ui_elem_active;
 }	t_rt;
@@ -199,12 +204,12 @@ void		render_pixel(t_rt *rt, t_int px, t_int py);
 /* Color picker */
 
 # define COLOR_PICKER_SCREEN_X_PERCENT 0.25f
-# define COLOR_PICKER_RING_INNER_RADIUS_PERCENT 0.7f
+# define COLOR_PICKER_RING_INNER_RAD 0.7f
 
 t_vec3f		hsv_to_rgb(t_vec3f hsv);
 t_vec3f		rgb_to_hsv(t_vec3f rgb);
-t_vec2f		sv_from_triangle_point(t_vec2f p);
-t_vec2f		triangle_point_from_sv(t_vec2f sv);
+t_vec2f		sv_from_triangle_point(t_f32 x, t_f32 y);
+t_vec2f		triangle_point_from_sv(t_f32 s, t_f32 v);
 
 t_vec4f		update_color_picker(t_rt *rt, t_vec4f color, t_bool has_alpha);
 void		draw_color_picker(t_rt *rt);
