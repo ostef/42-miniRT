@@ -2,9 +2,10 @@
 # so this is how we know we're on Windows
 
 SRC_DIR = source
-SRC_FILES = main.c objects.c camera.c edit_mode.c raycast.c transform.c\
+SRC_FILES = main.c camera.c edit_mode.c raycast.c\
 	parsing/parsing.c parsing/parse_objects.c parsing/parse_elements.c parsing/parse_info.c parsing/parsing_utils.c parsing/ft_atof.c\
 	intersection/sphere.c intersection/cylinder.c intersection/plane.c intersection/object.c\
+	objects/add.c objects/remove.c objects/transform.c\
 	render/clear_frame.c render/render_pixel.c\
 	draw/draw_pixel.c draw/draw_rect.c draw/draw_circle.c\
 	color_picker/conversion.c color_picker/update.c color_picker/triangle.c color_picker/draw.c\

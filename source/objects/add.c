@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   objects.c                                          :+:      :+:    :+:   */
+/*   add.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: soumanso <soumanso@student.42lyon.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -15,6 +15,7 @@
 t_object	*add_object(t_rt *rt)
 {
 	t_object	*obj;
+
 	if (rt->obj_count == rt->obj_cap)
 	{
 		rt->objs = ft_realloc (rt->objs, rt->obj_cap * sizeof(t_object),
@@ -71,16 +72,4 @@ t_object	*add_light(t_rt *rt, t_vec3f position, t_vec4f color)
 	obj->light.pos = position;
 	obj->color = color;
 	return (obj);
-}
-
-void	remove_object(t_rt *rt, t_s64 index)
-{
-	ft_assert(index >= 0 && index < rt->obj_count,
-		"Invalid obj index %d.", index);
-	while (index < rt->obj_count - 1)
-	{
-		rt->objs[index] = rt->objs[index + 1];
-		index += 1;
-	}
-	rt->obj_count -= 1;
 }
