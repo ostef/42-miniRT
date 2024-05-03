@@ -50,7 +50,7 @@ static void	update_window(t_window *win)
 		win->pixels, &bmi, DIB_RGB_COLORS, SRCCOPY);
 }
 
-void	main_loop(t_window *win, void (*f)(void *), void *data)
+void	main_loop(t_window *win, int (*f)(void *), void *data)
 {
 	while (win->opened)
 	{
